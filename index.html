@@ -6,6 +6,8 @@
   <title>THEMAYSKIY — Официальный Альянс</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" defer></script>
+  <!-- Библиотека для генерации QR-кодов прямо в браузере -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
@@ -163,9 +165,9 @@
     .doc-paper .stamp{display:inline-block;border:4px solid var(--red);color:var(--red);padding:15px 30px;font-weight:bold;text-transform:uppercase;transform:rotate(-15deg);position:absolute;bottom:80px;left:90px;opacity:.8;font-family:Inter,sans-serif;text-align:center;border-radius:50%;width:140px;height:140px;display:flex;justify-content:center;align-items:center;flex-direction:column;line-height:1.2;font-size:14px}
     
     /* Красивый QR-код в документах */
-    .doc-qr { position:absolute; bottom: 60px; right: 60px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:8px;}
-    .doc-qr img { width:90px; height:90px; margin-bottom:5px; }
-    .doc-qr span { font-family:Inter,sans-serif; font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.5px; }
+    .doc-qr { position:absolute; bottom: 60px; right: 60px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:8px; z-index: 10;}
+    .doc-qr img, .doc-qr canvas { width:90px !important; height:90px !important; margin-bottom:5px; display:block; }
+    .doc-qr span { font-family:Inter,sans-serif; font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.5px; text-align:center; }
 
     @media screen {
       body[data-theme="dark"] .doc-paper { background: #2a2a2a; color: #e0e0e0; }
@@ -334,7 +336,20 @@
       body.printing-doc .doc-paper .header-doc,
       body.printing-doc .doc-paper .signature { color: #000 !important; border-color: #000 !important; }
       body.printing-doc .doc-logo { display: block !important; visibility: visible !important; }
-      body.printing-doc .doc-qr { display: flex !important; }
+      
+      /* Гарантируем, что QR-код будет виден при печати */
+      body.printing-doc .doc-qr { 
+        display: flex !important; 
+        visibility: visible !important; 
+        position: absolute !important; 
+        bottom: 40px !important; 
+        right: 40px !important;
+      }
+      body.printing-doc .doc-qr canvas,
+      body.printing-doc .doc-qr img { 
+        display: block !important; 
+        visibility: visible !important; 
+      }
 
       body.printing-profile > *:not(#printProfileContent) { display: none !important; }
       body.printing-profile #printProfileContent {
@@ -2150,15 +2165,12 @@
       try {
         const approvedAt = new Date().toISOString();
         
-        // 1. Одобряем заявку
         let r = await db.from('applications').update({ status: 'approved', approved_at: approvedAt }).eq('id', id);
         if (r.error) throw new Error('Ошибка заявки: ' + r.error.message);
         
-        // 2. Обновляем профиль
         r = await db.from('profiles').update({ joined_at: approvedAt }).eq('id', userId);
         if (r.error) throw new Error('Ошибка профиля: ' + r.error.message);
         
-        // 3. Начисляем 1 000 000 МайБит
         const { data: prof, error: pErr } = await db.from('profiles').select('balance, company_name').eq('id', userId).single();
         if (pErr) throw new Error('Ошибка чтения баланса: ' + pErr.message);
         
@@ -2275,7 +2287,17 @@
       showLoading('Вход...');
       const { error } = await db.auth.signInWithPassword({ email, password: pass });
       hideLoading();
-      if (error) return message('Ошибка входа: ' + error.message, true);
+      
+      if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          return message('Ошибка: Почта не подтверждена. Проверьте почту или запросите сброс пароля.', true);
+        }
+        if (error.message.includes('Invalid login credentials')) {
+          return message('Ошибка: Неверный email или пароль.', true);
+        }
+        return message('Ошибка входа: ' + error.message, true);
+      }
+
       const { data: aal } = await db.auth.mfa.getAuthenticatorAssuranceLevel();
       if (aal?.nextLevel === 'aal2' && aal?.currentLevel === 'aal1') {
         const { data: factors } = await db.auth.mfa.listFactors();
@@ -2297,10 +2319,9 @@
       const code = displayCompanyCode(userProfile, currentUser?.id);
       const docLogo = getDocLogo();
       
-      // Генерируем QR-код с текущим URL сайта
-      const siteUrl = encodeURIComponent(window.location.origin);
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${siteUrl}`;
-      const qrBlock = `<div class="doc-qr"><img src="${qrUrl}" alt="QR" onerror="this.style.display='none'"><span>Сайт Альянса</span></div>`;
+      const siteUrl = window.location.origin;
+      // Контейнер для QR-кода. Генерируем позже через JS.
+      const qrBlock = `<div class="doc-qr"><div id="docQrContainer"></div><span>Сайт Альянса</span></div>`;
 
       const logoTop = `<img src="${docLogo}" class="doc-logo" alt="logo" onerror="this.style.display='none'">`;
       let html = '';
@@ -2325,6 +2346,22 @@
       }
       $('docContent').innerHTML = html;
       $('docModal').classList.add('show');
+
+      // Генерируем QR-код через библиотеку (он рисуется в canvas внутри div)
+      setTimeout(() => {
+        const qrEl = $('docQrContainer');
+        if (qrEl) {
+          qrEl.innerHTML = '';
+          new QRCode(qrEl, {
+            text: siteUrl,
+            width: 90,
+            height: 90,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+          });
+        }
+      }, 100);
     };
     window.closeDocument = () => $('docModal').classList.remove('show');
 
@@ -2341,13 +2378,11 @@
         if (uploadError) { hideLoading(); return message('Ошибка загрузки: ' + uploadError.message, true); }
         
         const { data: urlData } = db.storage.from('avatars').getPublicUrl(path);
-        // Добавляем параметр для сброса кэша, чтобы фото появилось сразу
         const freshUrl = `${urlData.publicUrl}?t=${Date.now()}`;
         
         const { error: updateError } = await db.from('profiles').upsert({ id: currentUser.id, avatar_url: freshUrl });
         if (updateError) { hideLoading(); return message('Ошибка: ' + updateError.message, true); }
         
-        // Мгновенно обновляем интерфейс и локальный профиль
         if (userProfile) userProfile.avatar_url = freshUrl;
         $('avatar').innerHTML = `<img src="${freshUrl}" onerror="this.parentElement.innerHTML='✦'">`;
         
