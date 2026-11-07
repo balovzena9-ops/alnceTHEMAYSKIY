@@ -61,6 +61,9 @@
     .red-check:hover{transform:scale(1.15)}
     .black-check{display:inline-grid;place-items:center;width:20px;height:20px;margin-left:8px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:11px;font-weight:900;cursor:help}
     
+    /* Индикатор уведомления в меню */
+    .notif-dot { display:inline-block; width:8px; height:8px; background:var(--red); border-radius:50%; margin-left:8px; vertical-align:middle; box-shadow:0 0 6px var(--red); animation:pulse 1.5s infinite; }
+
     .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
     details.section{border:1px solid var(--line);background:var(--paper);margin-bottom:15px;border-radius:16px;overflow:hidden}
     details.section>summary{padding:17px 20px;cursor:pointer;font-size:14px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
@@ -156,15 +159,21 @@
     .doc-paper h2{text-align:center;text-transform:uppercase;letter-spacing:3px;margin-bottom:40px;border-bottom:2px solid #000;padding-bottom:15px;font-size:24px;color:#000}
     .doc-paper p{font-size:16px;line-height:1.8;margin-bottom:20px;text-indent:40px;position:relative;color:#000}
     .doc-paper .header-doc{display:flex;justify-content:space-between;margin-bottom:40px;font-size:14px;border-bottom:1px solid #ccc;padding-bottom:10px;font-family:Inter,sans-serif;text-transform:uppercase;font-weight:bold;color:#000}
-    .doc-paper .signature{margin-top:100px;text-align:right;font-size:16px;font-style:italic;color:#000}
+    .doc-paper .signature{margin-top:100px;text-align:right;font-size:16px;font-style:italic;color:#000;padding-right: 120px;}
     .doc-paper .stamp{display:inline-block;border:4px solid var(--red);color:var(--red);padding:15px 30px;font-weight:bold;text-transform:uppercase;transform:rotate(-15deg);position:absolute;bottom:80px;left:90px;opacity:.8;font-family:Inter,sans-serif;text-align:center;border-radius:50%;width:140px;height:140px;display:flex;justify-content:center;align-items:center;flex-direction:column;line-height:1.2;font-size:14px}
     
+    /* Красивый QR-код в документах */
+    .doc-qr { position:absolute; bottom: 60px; right: 60px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:8px;}
+    .doc-qr img { width:90px; height:90px; margin-bottom:5px; }
+    .doc-qr span { font-family:Inter,sans-serif; font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.5px; }
+
     @media screen {
       body[data-theme="dark"] .doc-paper { background: #2a2a2a; color: #e0e0e0; }
       body[data-theme="dark"] .doc-paper h2,
       body[data-theme="dark"] .doc-paper p,
       body[data-theme="dark"] .doc-paper .header-doc,
       body[data-theme="dark"] .doc-paper .signature { color: #e0e0e0; border-color: #e0e0e0; }
+      body[data-theme="dark"] .doc-qr { background: #333; border-color: #555; }
     }
     
     .doc-logo{display:block;max-width:180px;width:60%;height:auto;margin:0 auto 30px}
@@ -279,6 +288,8 @@
     body.mobile-mode .doc-paper { padding: 30px 20px !important; min-height: auto !important; }
     body.mobile-mode .doc-paper .header-doc { flex-direction: column !important; gap: 10px !important; text-align: center !important; }
     body.mobile-mode .doc-paper .stamp { position: static !important; margin: 30px auto !important; transform: rotate(-10deg) !important; }
+    body.mobile-mode .doc-qr { position: static !important; margin: 20px auto 0 !important; }
+    body.mobile-mode .doc-paper .signature { padding-right: 0 !important; text-align: center !important; }
     body.mobile-mode .account-head { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
     body.mobile-mode .account-head > div:last-child { width: 100% !important; text-align: center !important; }
     body.mobile-mode .account-head > div:last-child label { display: inline-block !important; }
@@ -323,6 +334,7 @@
       body.printing-doc .doc-paper .header-doc,
       body.printing-doc .doc-paper .signature { color: #000 !important; border-color: #000 !important; }
       body.printing-doc .doc-logo { display: block !important; visibility: visible !important; }
+      body.printing-doc .doc-qr { display: flex !important; }
 
       body.printing-profile > *:not(#printProfileContent) { display: none !important; }
       body.printing-profile #printProfileContent {
@@ -468,6 +480,11 @@
               </div>
             </details>
 
+            <details class="section">
+              <summary>💳 Карта авиакомпании</summary>
+              <div class="section-content" id="cardStatusContent">Загрузка...</div>
+            </details>
+
             <details class="section" id="finesSection">
               <summary>Штрафы</summary>
               <div class="section-content"><div id="finesList">Загрузка...</div></div>
@@ -551,6 +568,17 @@
                   <button class="primary" id="btnVerifyMfa" type="button">Подтвердить код</button>
                 </div>
                 <button class="secondary" id="btnSetupMfa" type="button">Включить 2FA</button>
+              </div>
+            </details>
+
+            <details class="section">
+              <summary>🔐 Сменить пароль</summary>
+              <div class="section-content">
+                <p class="muted">Введите текущий и новый пароль. При смене Supabase отправит уведомление на почту.</p>
+                <div class="field"><label>Текущий пароль</label><input id="currPass" type="password" placeholder="Текущий пароль"></div>
+                <div class="field"><label>Новый пароль</label><input id="newPass" type="password" minlength="6" placeholder="Мин. 6 символов"></div>
+                <div class="field"><label>Повторите новый пароль</label><input id="newPassConfirm" type="password" minlength="6" placeholder="Повторите пароль"></div>
+                <button class="primary" id="btnChangePassword" type="button">Сменить пароль</button>
               </div>
             </details>
           </div>
@@ -665,17 +693,22 @@
           </div>
         </details>
 
-        <details class="section">
+        <details class="section" id="adminAppsSection">
           <summary>Заявки на вступление</summary>
           <div class="section-content" id="adminAppsList">Загрузка...</div>
         </details>
 
-        <details class="section">
+        <details class="section" id="adminCardsSection">
+          <summary>Заявки на Карты</summary>
+          <div class="section-content" id="adminCardsList">Загрузка...</div>
+        </details>
+
+        <details class="section" id="adminRegistrySection">
           <summary>Заявки в Реестр</summary>
           <div class="section-content" id="adminRegistryList">Загрузка...</div>
         </details>
 
-        <details class="section">
+        <details class="section" id="adminSubsSection">
           <summary>Дочерние компании (Одобрение)</summary>
           <div class="section-content" id="adminSubsList">Загрузка...</div>
         </details>
@@ -685,7 +718,7 @@
           <div class="section-content" id="adminAircraftOrders">Загрузка...</div>
         </details>
 
-        <details class="section">
+        <details class="section" id="adminMayskSection">
           <summary>Заявки в Майск</summary>
           <div class="section-content" id="adminMayskList">Загрузка...</div>
         </details>
@@ -834,11 +867,11 @@
     <div class="modal-content">
       <button class="close-modal" onclick="closeBuyAircraftModal()" style="color:var(--ink)">×</button>
       <h3>Покупка: <span id="buyModelName"></span></h3>
-      <p class="muted">Цена за самолёт: <span id="buyModelPrice" style="font-weight:bold;color:var(--red)"></span> руб.</p>
+      <p class="muted">Цена за самолёт: <span id="buyModelPrice" style="font-weight:bold;color:var(--red)"></span> МайБит</p>
       <div class="field"><label>Количество (макс. 5 одной модели за месяц)</label><input id="buyQuantity" type="number" value="1" min="1" max="5"></div>
-      <p class="muted">Итого за заказ: <strong id="buyTotalPrice">0 руб.</strong></p>
+      <p class="muted">Итого за заказ: <strong id="buyTotalPrice">0 МайБит</strong></p>
       <div class="field"><label>Почта для связи</label><input id="buyEmail" type="email" placeholder="director@company.com"></div>
-      <div class="field"><label>Для подтверждения напишите слово "карта" (это не списание реальных денег)</label><input id="buyCard" type="text" placeholder="карта"></div>
+      <div class="field"><label>Введите номер карты авиакомпании (не настоящей!)</label><input id="buyCard" type="text" placeholder="БББ 0000 000 000"></div>
       <label class="muted" style="display:flex;align-items:center;gap:5px;margin:15px 0;font-size:12px">
         <input type="checkbox" id="buyConsent"> Согласен на обработку персональных данных
       </label>
@@ -884,10 +917,10 @@
     const MEMBERS_PER_PAGE = 20;
 
     const HOLIDAYS = [
-      { month: 10, day: 5, name: 'День рождения Майских авиалиний', bonus: 10000, type: 'main', icon: '🎂' },
+      { month: 10, day: 5, name: 'День рождения Майских авиалиний', bonus: 10000000, type: 'main', icon: '🎂' },
       { month: 2, day: 10, name: 'День рождения Баловск', discount: 10, type: 'big', icon: '✈️' },
-      { month: 2, day: 16, name: 'День рождения альянса THEMAYSKIY', bonus: 10000, type: 'main', icon: '🏆' },
-      { month: 1, day: 16, name: 'День рождения директора Майских авиалиний', type: 'main', icon: '👑' },
+      { month: 2, day: 16, name: 'День рождения альянса THEMAYSKIY', bonus: 10000000, type: 'main', icon: '🏆' },
+      { month: 1, day: 16, name: 'День рождения директора Майских авиалиний', bonus: 5000000, type: 'main', icon: '👑' },
       { month: 1, day: 16, name: 'День независимости Майских авиалиний', type: 'big', icon: '🎆' },
       { month: 7, day: 4, name: 'День рождения Виктории (заместителя)', type: 'big', icon: '🌟' },
       { month: 10, day: 30, name: 'День рождения авиакомпании Виктория', type: 'medium', icon: '✈️' },
@@ -905,10 +938,14 @@
       ['Б-1⁶⁶⁰С (Карго)', 24500900, 'Карго'], ['Б-2⁶⁶⁰С (Карго)', 26000000000, 'Карго'],
       ['Б-2⁵⁵⁰С (Карго)', 25000000000, 'Карго'], ['Б-17³⁴⁰⁰С (Карго)', 156780000000, 'Карго'],
       ['Б-1⁸⁹⁰С (Карго)', 55000000, 'Карго'], ['БЭКО-1 (Экотопливо)', 170000000000, 'Экотопливо']
-    ].map(([model, price, note]) => ({ model, price, note: note || '' }));
+    ].map(([model, rubPrice, note]) => ({ 
+      model, 
+      price: rubPrice * 50,
+      note: note || '' 
+    }));
 
     const ASSISTANT_QA = [
-      { q: "Как получить валюту альянса?", a: "Каждые 3 недели начисляется по 100 МайБит. Также по праздникам начисляются бонусы — например, 5 октября и 16 февраля приходит по 10 000 МайБит! Следите за разделом «Праздники».", highlight: '#holidaysSection' },
+      { q: "Как получить валюту альянса?", a: "Каждые 3 недели начисляется по 100 МайБит. Также по праздникам начисляются бонусы — например, 5 октября и 16 февраля приходит по 10 000 000 МайБит! Следите за разделом «Праздники».", highlight: '#holidaysSection' },
       { q: "Как вступить в реестр Майских компаний?", a: "Откройте раздел «Реестр Майские компании» в вашем кабинете и нажмите «Подать заявление в реестр». После одобрения вы получите код MY.", highlight: '#btnOpenRegistryForm' },
       { q: "Как начать летать в Майск?", a: "Подайте заявку в разделе «Полет в Майск». Заполните название компании и причину. После одобрения главой альянса разрешение появится в документах.", highlight: '#mayskCompany' },
       { q: "Где купить Баловск?", a: "В разделе «Заказы Баловск» — там вы найдёте все модели самолётов с ценами. Лимит — 5 самолётов одной модели в месяц.", highlight: '#aircraftMarketplace' },
@@ -935,7 +972,6 @@
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-    // ===== ЛОГОТИП ДЛЯ ДОКУМЕНТОВ (по умолчанию LOGO_LIGHT — тёмный текст) =====
     function getDocLogo() {
       return localStorage.getItem('custom_doc_logo') || LOGO_LIGHT;
     }
@@ -964,6 +1000,16 @@
       message('Логотип сброшен на стандартный');
       closeThemeModal();
     };
+
+    function updateSectionBadge(sectionId, count) {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      const summary = el.querySelector('summary');
+      if (!summary) return;
+      const currentText = summary.innerHTML.replace('<span class="notif-dot"></span>', '');
+      if (count > 0) summary.innerHTML = currentText + ' <span class="notif-dot"></span>';
+      else summary.innerHTML = currentText;
+    }
 
     function setDeviceMode(mode, fromSettings = false) {
       localStorage.setItem('device_mode', mode);
@@ -1055,16 +1101,14 @@
       const email = $('resetEmail').value.trim();
       if (!email) return message('Введите email', true);
       showLoading('Отправка...');
-      // ВАЖНО: полный URL страницы без хэша. Supabase должен быть настроен в Authentication → URL Configuration
       const redirectTo = window.location.href.split('#')[0];
       const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
       hideLoading();
       if (error) return message(error.message, true);
-      message('Ссылка отправлена на почту! Открой её — откроется форма нового пароля.');
+      message('Ссылка отправлена на почту!');
       closeResetModal();
     }
 
-    // ===== Сброс пароля: новая форма =====
     window.closeResetPasswordModal = () => $('resetPasswordModal').classList.remove('show');
     window.saveNewPassword = async function() {
       const p1 = $('newPassword').value;
@@ -1095,7 +1139,6 @@
       $('topCabinet').classList.toggle('hidden', !isAdmin || name !== 'adminPage');
     }
 
-    // ===== MFA-режим: скрываем email/password, показываем только код =====
     function setMfaMode(visible) {
       const emailField = $('email').closest('.field');
       const passField = $('password').closest('.field');
@@ -1115,9 +1158,6 @@
         mfaField.classList.add('hidden');
         $('mfaCode').value = '';
         window.tempFactorId = null;
-        if (!$('registerCompanyField').classList.contains('hidden') === false) {
-          // не перезаписываем режим регистрации
-        }
       }
     }
 
@@ -1180,13 +1220,14 @@
     async function updateAdminBadge() {
       if (!isAdmin) return;
       try {
-        const [apps, regs, maysks, subs] = await Promise.all([
+        const [apps, regs, maysks, subs, cards] = await Promise.all([
           db.from('applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           db.from('registry_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           db.from('maysk_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-          db.from('subsidiaries').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+          db.from('subsidiaries').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          db.from('profiles').select('id', { count: 'exact', head: true }).eq('card_status', 'pending')
         ]);
-        const total = (apps.count||0)+(regs.count||0)+(maysks.count||0)+(subs.count||0);
+        const total = (apps.count||0)+(regs.count||0)+(maysks.count||0)+(subs.count||0)+(cards.count||0);
         const badge = $('adminBadgeCount');
         if (badge) { badge.textContent = total; badge.classList.toggle('hidden', total === 0); }
       } catch (e) { console.error(e); }
@@ -1542,14 +1583,78 @@
       await loadDashboard(true);
     });
 
+    async function loadCardStatus() {
+      const content = $('cardStatusContent');
+      if (!content || !userProfile) return;
+      
+      const status = userProfile.card_status || 'none';
+      const cardNum = userProfile.card_number || '—';
+      const rejAt = userProfile.card_rejected_at ? new Date(userProfile.card_rejected_at).getTime() : 0;
+      const daysLeft = 7 - Math.floor((Date.now() - rejAt) / 86400000);
+
+      if (status === 'approved') {
+        content.innerHTML = `<p style="font-size:20px;font-weight:bold;color:var(--green);letter-spacing:2px">${esc(cardNum)}</p><p class="muted">Ваша карта активна. Используйте этот номер при покупке самолётов.</p>`;
+      } else if (status === 'pending') {
+        content.innerHTML = `<p style="color:var(--accent)">⏳ Заявка на рассмотрении у главы альянса...</p>`;
+      } else {
+        let msg = status === 'rejected' && daysLeft > 0 ? `Отказано. Повторно через ${daysLeft} дн.` : '';
+        content.innerHTML = `<p class="muted">Получите карту для покупки самолетов.</p><button class="primary" ${daysLeft > 0 ? 'disabled' : ''} onclick="requestCard()">Получить карту</button><p style="color:var(--red);font-size:12px;margin-top:8px">${msg}</p>`;
+      }
+    }
+
+    window.requestCard = async () => {
+      if (!currentUser) return;
+      showLoading('Генерация...');
+      
+      const name = (userProfile.company_name || 'XX').trim();
+      const words = name.split(/\s+/);
+      let prefix = '';
+      if (words.length >= 3) prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
+      else if (words.length === 2) prefix = (words[0][0] + words[1][0]).toUpperCase();
+      else prefix = name.slice(0, 3).toUpperCase();
+
+      const p1 = Math.floor(1000 + Math.random() * 9000);
+      const p2 = Math.floor(100 + Math.random() * 900);
+      const p3 = Math.floor(100 + Math.random() * 900);
+      const newCard = `${prefix} БББ ${p1} ${p2} ${p3}`;
+
+      const { error } = await db.from('profiles').update({ card_status: 'pending', card_number: newCard }).eq('id', currentUser.id);
+      hideLoading();
+      if (error) return message(error.message, true);
+      message('Заявка на карту отправлена!');
+      await loadDashboard(true);
+    };
+
+    $('btnChangePassword').addEventListener('click', async () => {
+      const curr = $('currPass').value;
+      const p1 = $('newPass').value;
+      const p2 = $('newPassConfirm').value;
+      if (!curr) return message('Введите текущий пароль', true);
+      if (p1.length < 6) return message('Новый пароль должен быть не менее 6 символов', true);
+      if (p1 !== p2) return message('Новые пароли не совпадают', true);
+      
+      showLoading('Проверка текущего пароля...');
+      
+      const { error: signInError } = await db.auth.signInWithPassword({ email: currentUser.email, password: curr });
+      if (signInError) { hideLoading(); return message('Неверный текущий пароль!', true); }
+      
+      showLoading('Смена пароля...');
+      const { error } = await db.auth.updateUser({ password: p1 });
+      hideLoading();
+      if (error) return message(error.message, true);
+      
+      message('✅ Пароль успешно изменён! Проверьте почту, Supabase отправил уведомление.');
+      $('currPass').value = ''; $('newPass').value = ''; $('newPassConfirm').value = '';
+    });
+
     function updateBuyTotal() {
       if (!selectedAircraft) return;
       const qty = Math.max(1, Number($('buyQuantity').value) || 1);
-      $('buyTotalPrice').textContent = (selectedAircraft.price * qty).toLocaleString('ru-RU') + ' руб.';
+      $('buyTotalPrice').textContent = (selectedAircraft.price * qty).toLocaleString('ru-RU') + ' МайБит';
     }
     $('buyQuantity').addEventListener('input', updateBuyTotal);
     function renderMarketplace() {
-      $('aircraftMarketplace').innerHTML = AIRCRAFT_DATA.map((a, i) => `<div class="aircraft-card"><div><h4>${esc(a.model)}</h4>${a.note ? `<div class="muted">${esc(a.note)}</div>` : ''}<div class="price">${a.price.toLocaleString('ru-RU')} руб.</div></div><button class="primary" onclick="openBuyAircraft(${i})">Заказать</button></div>`).join('');
+      $('aircraftMarketplace').innerHTML = AIRCRAFT_DATA.map((a, i) => `<div class="aircraft-card"><div><h4>${esc(a.model)}</h4>${a.note ? `<div class="muted">${esc(a.note)}</div>` : ''}<div class="price">${a.price.toLocaleString('ru-RU')} МайБит</div></div><button class="primary" onclick="openBuyAircraft(${i})">Заказать</button></div>`).join('');
     }
     function openBuyAircraft(index) {
       if (isProcessing) return;
@@ -1565,12 +1670,13 @@
     async function confirmBuyAircraft() {
       if (isProcessing) return;
       if (!selectedAircraft || !currentUser) return message('Не выбран самолёт', true);
+      if (userProfile?.card_status !== 'approved') return message('У вас нет одобренной карты!', true);
       const qty = Number($('buyQuantity').value);
       const email = $('buyEmail').value.trim();
       const consent = $('buyConsent').checked;
       if (!Number.isInteger(qty) || qty < 1 || qty > 5) return message('Количество от 1 до 5', true);
       if (!email || !$('buyEmail').validity.valid) return message('Введите корректную почту', true);
-      if ($('buyCard').value.trim().toLowerCase() !== 'карта') return message('Напишите слово «карта»', true);
+      if ($('buyCard').value.trim().toUpperCase() !== (userProfile.card_number || '').toUpperCase()) return message('Неверный номер карты!', true);
       if (!consent) return message('Необходимо согласие', true);
       showLoading('Оформляем заказ...');
       const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
@@ -1676,7 +1782,7 @@
       document.querySelectorAll('.expense-month').forEach(x => expensesM += Number(x.value) || 0);
       document.querySelectorAll('.expense-year').forEach(x => expensesY += Number(x.value) || 0);
       const netM = revenueM - expensesM, netY = revenueY - expensesY;
-      $('calcResult').innerHTML = `Чистая прибыль за месяц: <span style="color:${netM >= 0 ? 'var(--green)' : 'var(--red)'}">${netM.toLocaleString('ru-RU')} руб.</span><br>Чистая прибыль за год: <span style="color:${netY >= 0 ? 'var(--green)' : 'var(--red)'}">${netY.toLocaleString('ru-RU')} руб.</span><div class="muted" style="margin-top:8px">Расчёт выполнен в браузере.</div>`;
+      $('calcResult').innerHTML = `Чистая прибыль за месяц: <span style="color:${netM >= 0 ? 'var(--green)' : 'var(--red)'}">${netM.toLocaleString('ru-RU')} МайБит</span><br>Чистая прибыль за год: <span style="color:${netY >= 0 ? 'var(--green)' : 'var(--red)'}">${netY.toLocaleString('ru-RU')} МайБит</span><div class="muted" style="margin-top:8px">Расчёт выполнен в браузере.</div>`;
     });
 
     async function loadDashboard(silent = false) {
@@ -1719,6 +1825,7 @@
           if (joinedAt) { const days = Math.floor((Date.now() - joinedAt.getTime()) / 86400000); $('statTime').textContent = `В альянсе: ${days.toLocaleString('ru-RU')} ${pluralDays(days)}`; $('statDate').textContent = `Дата вступления: ${joinedAt.toLocaleDateString('ru-RU')}`; }
           else { $('statTime').textContent = 'В альянсе: не состоит'; $('statDate').textContent = 'Дата вступления: —'; }
           await loadLoans();
+          await loadCardStatus();
           const joined = profile?.joined_at != null;
           const bdaySaveBtn = $('btnSaveBirthday'), bdayRemoveBtn = $('btnRemoveBirthday'), bdayInput = $('userBirthday'), bdayHint = $('birthdayHint');
           if (joined) { bdaySaveBtn.disabled = false; bdaySaveBtn.style.opacity = ''; bdaySaveBtn.style.cursor = ''; bdaySaveBtn.textContent = 'Сохранить'; bdayRemoveBtn.disabled = false; bdayRemoveBtn.style.opacity = ''; bdayInput.disabled = false; bdayInput.style.opacity = ''; if (bdayHint) bdayHint.textContent = ''; }
@@ -1743,6 +1850,8 @@
         const { data: posts } = await db.from('posts').select('*').gte('created_at', since).order('created_at', { ascending: false }).limit(10);
         $('newsList').innerHTML = posts?.length ? posts.map(p => `<div class="post-card"><div class="post-header"><strong>${esc(p.author_name)}</strong>${p.author_name === ADMIN_NAME ? adminBadge() : ''}<span>${new Date(p.created_at).toLocaleString()}</span></div><div class="post-content">${esc(p.content)}</div></div>`).join('') : '<div class="muted">Новостей нет.</div>';
 
+        updateSectionBadge('newsSection', posts?.length || 0);
+
         const { data: allProfiles } = await db.from('profiles').select('id,company_name,birthday_date');
         await renderHolidays(allProfiles);
         await loadMembers();
@@ -1763,6 +1872,9 @@
 
         const { data: fines } = await db.from('fines').select('*').eq('user_id', user.id).eq('status', 'unpaid');
         $('statFines').textContent = `Штрафов: ${fines?.length || 0}`;
+        
+        updateSectionBadge('finesSection', fines?.length || 0);
+
         if (!isAdmin) {
           $('finesList').innerHTML = fines?.length ? fines.map(f => `<div class="fine-banner"><div class="fine-header">Штраф от Майских ${adminBadge()}</div><div class="fine-amount">${esc(f.amount)} МайБит</div><div class="fine-reason">Причина: ${esc(f.reason)}</div><button class="btn-pay" onclick="payFine('${esc(f.id)}')">Оплатить</button></div>`).join('') : '<div class="muted">Штрафов нет.</div>';
         }
@@ -1843,9 +1955,16 @@
       $('adminPostsList').innerHTML = allPosts?.length ? allPosts.map(p => `<div class="post-card"><button class="post-delete-btn" onclick="deletePost('${esc(p.id)}')" title="Удалить">×</button><div class="post-header"><strong>${esc(p.author_name)}</strong><span>${new Date(p.created_at).toLocaleString()}</span></div><div class="post-content">${esc(p.content)}</div></div>`).join('') : 'Нет постов.';
 
       const { data: apps } = await db.from('applications').select('*').order('created_at', { ascending: false });
+      const pendingApps = apps?.filter(a => a.status === 'pending').length || 0;
+      updateSectionBadge('adminAppsSection', pendingApps);
       $('adminAppsList').innerHTML = apps?.map(a => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(a.company_name)}</h4><p class="muted">${esc(a.contact_email)}</p></div>${a.status === 'pending' ? `<div class="admin-actions"><button class="primary" onclick="approveApp('${esc(a.id)}','${esc(a.user_id)}')">Принять</button><button class="secondary" onclick="rejectApp('${esc(a.id)}')">Отказать</button></div>` : esc(a.status)}</div>`).join('') || 'Нет заявок.';
 
+      const { data: cards } = await db.from('profiles').select('id,company_name,card_number,avatar_url').eq('card_status', 'pending');
+      updateSectionBadge('adminCardsSection', cards?.length || 0);
+      $('adminCardsList').innerHTML = cards?.length ? cards.map(c => `<div class="admin-card"><div class="avatar">${c.avatar_url ? `<img src="${esc(c.avatar_url)}">` : '✦'}</div><div class="admin-card-info"><h4>${esc(c.company_name)}</h4><p class="muted">Карта: <strong>${esc(c.card_number)}</strong></p></div><div class="admin-actions"><button class="primary" onclick="approveCard('${esc(c.id)}')">Одобрить</button><button class="secondary" onclick="rejectCard('${esc(c.id)}')">Отклонить</button></div></div>`).join('') : 'Нет заявок.';
+
       const { data: regs } = await db.from('registry_applications').select('*').eq('status', 'pending');
+      updateSectionBadge('adminRegistrySection', regs?.length || 0);
       const subIds = (regs || []).filter(r => r.application_type === 'subsidiary' && r.subsidiary_id).map(r => r.subsidiary_id);
       const { data: subsData } = subIds.length ? await db.from('subsidiaries').select('id,parent_id').in('id', subIds) : { data: [] };
       const parentIds = [...new Set((subsData || []).map(s => s.parent_id).filter(Boolean))];
@@ -1860,6 +1979,7 @@
       }).join('') || 'Нет заявок.';
 
       const { data: subs } = await db.from('subsidiaries').select('*').eq('status', 'pending');
+      updateSectionBadge('adminSubsSection', subs?.length || 0);
       $('adminSubsList').innerHTML = subs?.map(s => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(s.company_name)}</h4></div><button class="primary" onclick="approveSub('${esc(s.id)}')">Одобрить</button><button class="secondary" onclick="rejectSub('${esc(s.id)}')">Отклонить</button></div>`).join('') || 'Нет заявок.';
 
       const { data: orders } = await db.from('aircraft_orders').select('*').in('status', ['assembling', 'ready']).order('created_at', { ascending: true });
@@ -1872,12 +1992,13 @@
         $('adminAircraftOrders').innerHTML = Object.entries(grouped).map(([uid, uo]) => {
           const cn = names[uid] || 'Компания';
           const badge = uid === ADMIN_UID ? adminBadge() : '';
-          const oh = uo.map(o => { const ready = new Date(o.ready_at || new Date(o.created_at).getTime() + 7 * 86400000); const can = o.status === 'ready' || Date.now() >= ready.getTime(); return `<div class="order-row"><span><strong>${esc(o.model)}</strong> × ${Number(o.quantity)}</span><span class="muted">${Number(o.price).toLocaleString('ru-RU')} руб.</span><span class="muted" style="font-size:11px">${can ? '✅ Готов' : '⏳ до ' + ready.toLocaleDateString('ru-RU')}</span><div style="display:flex;gap:5px">${can ? `<button class="primary" style="padding:6px 12px;font-size:11px" onclick="releaseAircraft('${esc(o.id)}')">＋ Выдать</button>` : ''}<button class="secondary" style="padding:6px 12px;font-size:11px;border-color:var(--red);color:var(--red)" onclick="cancelAircraftOrder('${esc(o.id)}')">✕</button></div></div>`; }).join('');
+          const oh = uo.map(o => { const ready = new Date(o.ready_at || new Date(o.created_at).getTime() + 7 * 86400000); const can = o.status === 'ready' || Date.now() >= ready.getTime(); return `<div class="order-row"><span><strong>${esc(o.model)}</strong> × ${Number(o.quantity)}</span><span class="muted">${Number(o.price).toLocaleString('ru-RU')} МайБит</span><span class="muted" style="font-size:11px">${can ? '✅ Готов' : '⏳ до ' + ready.toLocaleDateString('ru-RU')}</span><div style="display:flex;gap:5px">${can ? `<button class="primary" style="padding:6px 12px;font-size:11px" onclick="releaseAircraft('${esc(o.id)}')">＋ Выдать</button>` : ''}<button class="secondary" style="padding:6px 12px;font-size:11px;border-color:var(--red);color:var(--red)" onclick="cancelAircraftOrder('${esc(o.id)}')">✕</button></div></div>`; }).join('');
           return `<div class="company-orders-box"><h4>🏢 ${esc(cn)}${badge}</h4>${oh}</div>`;
         }).join('');
       } else $('adminAircraftOrders').textContent = 'Нет заказов.';
 
       const { data: maysks } = await db.from('maysk_requests').select('*').eq('status', 'pending');
+      updateSectionBadge('adminMayskSection', maysks?.length || 0);
       $('adminMayskList').innerHTML = maysks?.map(m => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(m.company_name)}</h4><p class="muted">${esc(m.reason)}</p></div><div class="admin-actions"><button class="primary" onclick="approveMaysk('${esc(m.id)}')">Одобрить</button><button class="secondary" onclick="rejectMaysk('${esc(m.id)}')">Отказать</button></div></div>`).join('') || 'Нет заявок.';
 
       const { data: loans } = await db.from('loans').select('*').eq('status', 'active');
@@ -1890,6 +2011,22 @@
       $('adminFineTarget').innerHTML = options || '<option value="">—</option>';
       $('adminBalanceTarget').innerHTML = options || '<option value="">—</option>';
     }
+
+    window.approveCard = async (userId) => {
+      if (!confirm('Одобрить карту?')) return;
+      showLoading('...');
+      await db.from('profiles').update({ card_status: 'approved' }).eq('id', userId);
+      hideLoading(); await logAdminAction('Одобрение карты', userId);
+      message('Карта одобрена!'); await loadAdminData(); await updateAdminBadge();
+    };
+
+    window.rejectCard = async (userId) => {
+      if (!confirm('Отклонить карту?')) return;
+      showLoading('...');
+      await db.from('profiles').update({ card_status: 'rejected', card_rejected_at: new Date().toISOString() }).eq('id', userId);
+      hideLoading(); await logAdminAction('Отклонение карты', userId);
+      message('Карта отклонена!'); await loadAdminData(); await updateAdminBadge();
+    };
 
     window.deletePost = async (postId) => {
       if (!isAdmin) return message('Нет прав на удаление', true);
@@ -1918,13 +2055,37 @@
 
     window.expelMember = async (userId, name) => {
       if (isProcessing) return;
-      if (!confirm(`Изгнать "${name}" из альянса?\n\nАккаунт НЕ удаляется, но теряет членство.`)) return;
+      if (!confirm(`Изгнать "${name}" из альянса?\n\nАккаунт НЕ удаляется, но теряет членство, реестр, полеты и дочерние компании.`)) return;
       showLoading('Изгнание...');
-      const { error } = await db.from('profiles').update({ joined_at: null, rank: 'Участник', expelled_at: new Date().toISOString() }).eq('id', userId);
-      hideLoading();
-      if (error) return message(error.message, true);
-      await logAdminAction('Изгнание из альянса', name);
-      message(`"${name}" изгнана`); await loadAdminData(); await updateAdminBadge();
+      
+      try {
+        await db.from('profiles').update({ 
+            joined_at: null, 
+            rank: 'Участник', 
+            registry_status: null, 
+            expelled_at: new Date().toISOString() 
+        }).eq('id', userId);
+
+        await db.from('maysk_requests').delete().eq('user_id', userId);
+        await db.from('registry_applications').delete().eq('user_id', userId);
+
+        const { data: subs } = await db.from('subsidiaries').select('id').or(`parent_id.eq.${userId},user_id.eq.${userId}`);
+        if (subs && subs.length > 0) {
+            const subIds = subs.map(s => s.id);
+            await db.from('registry_applications').delete().in('subsidiary_id', subIds);
+            await db.from('subsidiaries').delete().in('id', subIds);
+        }
+
+        hideLoading(); 
+        await logAdminAction('Изгнание из альянса', name);
+        message(`"${name}" изгнана. Все права и дочерние компании аннулированы.`); 
+        await loadAdminData(); 
+        await updateAdminBadge();
+
+      } catch (err) {
+        hideLoading();
+        message('Ошибка при изгнании: ' + err.message, true);
+      }
     };
 
     window.releaseAircraft = async orderId => {
@@ -1985,13 +2146,44 @@
       if (isProcessing) return;
       if (!confirm('Принять компанию в альянс?')) return;
       showLoading('Принятие...');
-      const approvedAt = new Date().toISOString();
-      let r = await db.from('applications').update({ status: 'approved', approved_at: approvedAt }).eq('id', id);
-      if (r.error) { hideLoading(); return message(r.error.message, true); }
-      r = await db.from('profiles').update({ joined_at: approvedAt }).eq('id', userId);
-      if (r.error) { hideLoading(); return message(r.error.message, true); }
-      hideLoading(); await logAdminAction('Принятие в альянс', null, userId);
-      message('Принято!'); await loadAdminData(); await updateAdminBadge();
+      
+      try {
+        const approvedAt = new Date().toISOString();
+        
+        // 1. Одобряем заявку
+        let r = await db.from('applications').update({ status: 'approved', approved_at: approvedAt }).eq('id', id);
+        if (r.error) throw new Error('Ошибка заявки: ' + r.error.message);
+        
+        // 2. Обновляем профиль
+        r = await db.from('profiles').update({ joined_at: approvedAt }).eq('id', userId);
+        if (r.error) throw new Error('Ошибка профиля: ' + r.error.message);
+        
+        // 3. Начисляем 1 000 000 МайБит
+        const { data: prof, error: pErr } = await db.from('profiles').select('balance, company_name').eq('id', userId).single();
+        if (pErr) throw new Error('Ошибка чтения баланса: ' + pErr.message);
+        
+        if (prof) {
+          const newBalance = Number(prof.balance || 0) + 1000000;
+          const { error: bErr } = await db.from('profiles').update({ balance: newBalance }).eq('id', userId);
+          if (bErr) {
+            console.error('Ошибка при начислении МайБит:', bErr);
+            message('Принято, но ошибка начисления МайБит: ' + bErr.message, true);
+          } else {
+            await db.from('transactions').insert({ sender_name: 'Альянс (Принятие)', receiver_name: prof.company_name, amount: 1000000, type: 'balance' });
+          }
+        }
+
+        hideLoading(); 
+        await logAdminAction('Принятие в альянс', null, userId);
+        message('Принято! +1 000 000 МайБит начислено.'); 
+        await loadAdminData(); 
+        await updateAdminBadge();
+        
+      } catch (err) {
+        hideLoading();
+        console.error(err);
+        message(err.message, true);
+      }
     };
 
     window.rejectApp = async id => { if (!confirm('Отклонить заявку?')) return; showLoading('...'); await db.from('applications').update({ status: 'rejected' }).eq('id', id); hideLoading(); await logAdminAction('Отклонение заявки', null, id); await loadAdminData(); await updateAdminBadge(); };
@@ -2104,6 +2296,12 @@
       const company = esc(userProfile?.company_name || '...');
       const code = displayCompanyCode(userProfile, currentUser?.id);
       const docLogo = getDocLogo();
+      
+      // Генерируем QR-код с текущим URL сайта
+      const siteUrl = encodeURIComponent(window.location.origin);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${siteUrl}`;
+      const qrBlock = `<div class="doc-qr"><img src="${qrUrl}" alt="QR" onerror="this.style.display='none'"><span>Сайт Альянса</span></div>`;
+
       const logoTop = `<img src="${docLogo}" class="doc-logo" alt="logo" onerror="this.style.display='none'">`;
       let html = '';
       if (type === 'maysk') {
@@ -2112,18 +2310,18 @@
       }
       
       if (type === 'alliance') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Свидетельство о вступлении</h2><p>Настоящим официальным документом удостоверяется, что авиакомпания <strong>${company}</strong> (Код: ${code}) является участником <strong>THEMAYSKIY</strong>.</p><p>Авиакомпания обязуется соблюдать устав альянса и вносить вклад в развитие экосистемы.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Утверждено<br>Главой Альянса</div>`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Свидетельство о вступлении</h2><p>Настоящим официальным документом удостоверяется, что авиакомпания <strong>${company}</strong> (Код: ${code}) является участником <strong>THEMAYSKIY</strong>.</p><p>Авиакомпания обязуется соблюдать устав альянса и вносить вклад в развитие экосистемы.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Утверждено<br>Главой Альянса</div>${qrBlock}`;
       } else if (type === 'subsidiaries') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Реестр дочерних компаний</h2><p>Настоящий документ подтверждает наличие дочерних компаний под управлением <strong>${company}</strong> (Код: ${code}).</p><div id="docSubsList">Загрузка...</div><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Официальный<br>реестр</div>`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Реестр дочерних компаний</h2><p>Настоящий документ подтверждает наличие дочерних компаний под управлением <strong>${company}</strong> (Код: ${code}).</p><div id="docSubsList">Загрузка...</div><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Официальный<br>реестр</div>${qrBlock}`;
         setTimeout(async () => {
           const { data } = await db.from('subsidiaries').select('company_name').eq('parent_id', currentUser.id).eq('status', 'approved');
           const el = $('docSubsList');
           if (el) el.innerHTML = data?.length ? '<ul>' + data.map(s => `<li>${esc(s.company_name)}</li>`).join('') + '</ul>' : 'Нет дочек';
         }, 0);
       } else if (type === 'registry') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Выписка из Реестра</h2><p>Авиакомпания <strong>${company}</strong> (Код: ${code}) зарегистрирована в реестре <strong>"Майские компании"</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Майские<br>Компании</div>`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Выписка из Реестра</h2><p>Авиакомпания <strong>${company}</strong> (Код: ${code}) зарегистрирована в реестре <strong>"Майские компании"</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Майские<br>Компании</div>${qrBlock}`;
       } else if (type === 'maysk') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Разрешение на полеты</h2><p>Настоящий документ подтверждает, что авиакомпании <strong>${company}</strong> (Код: ${code}) разрешено выполнять рейсы в город <strong>Майск</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Полет<br>Разрешен</div>`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Разрешение на полеты</h2><p>Настоящий документ подтверждает, что авиакомпании <strong>${company}</strong> (Код: ${code}) разрешено выполнять рейсы в город <strong>Майск</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Полет<br>Разрешен</div>${qrBlock}`;
       }
       $('docContent').innerHTML = html;
       $('docModal').classList.add('show');
@@ -2141,11 +2339,20 @@
         const path = `${currentUser.id}-${Date.now()}.${ext}`;
         const { error: uploadError } = await db.storage.from('avatars').upload(path, file, { upsert: true });
         if (uploadError) { hideLoading(); return message('Ошибка загрузки: ' + uploadError.message, true); }
+        
         const { data: urlData } = db.storage.from('avatars').getPublicUrl(path);
-        const { error: updateError } = await db.from('profiles').upsert({ id: currentUser.id, avatar_url: urlData.publicUrl });
+        // Добавляем параметр для сброса кэша, чтобы фото появилось сразу
+        const freshUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+        
+        const { error: updateError } = await db.from('profiles').upsert({ id: currentUser.id, avatar_url: freshUrl });
         if (updateError) { hideLoading(); return message('Ошибка: ' + updateError.message, true); }
-        $('avatar').innerHTML = `<img src="${urlData.publicUrl}" onerror="this.parentElement.innerHTML='✦'">`;
-        hideLoading(); message('✅ Аватар обновлён!'); await loadDashboard(true);
+        
+        // Мгновенно обновляем интерфейс и локальный профиль
+        if (userProfile) userProfile.avatar_url = freshUrl;
+        $('avatar').innerHTML = `<img src="${freshUrl}" onerror="this.parentElement.innerHTML='✦'">`;
+        
+        hideLoading(); message('✅ Аватар обновлён!'); 
+        await loadDashboard(true);
       } catch (err) { hideLoading(); message('Ошибка: ' + err.message, true); }
     });
 
@@ -2196,24 +2403,39 @@
 
     $('applicationForm').addEventListener('submit', async e => {
       e.preventDefault();
+      if (isProcessing) return;
       const { data: { user } } = await db.auth.getUser();
       if (!user) return message('Войдите в аккаунт', true);
+      
+      $('applicationSubmit').disabled = true;
+      $('applicationSubmit').textContent = 'Отправка...';
       showLoading('Отправка...');
+      
       const company_name = $('applicationCompany').value.trim();
       const bloodPref = $('applicationBlood').value === 'true';
       const { error } = await db.from('applications').insert({ user_id: user.id, company_name, callsign: $('applicationCallsign').value, ready: $('applicationReady').value, contact_email: $('applicationEmail').value, status: 'pending' });
-      if (error) { hideLoading(); return message(error.message, true); }
+      
+      if (error) { 
+          hideLoading(); 
+          $('applicationSubmit').disabled = false;
+          $('applicationSubmit').textContent = 'Подать документ';
+          return message(error.message, true); 
+      }
+      
       await db.from('profiles').upsert({ id: user.id, company_name, blood_effects: bloodPref });
       localStorage.setItem('blood_effects', bloodPref ? 'true' : 'false');
       fetch('https://formspree.io/f/xeaalzlg', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: company_name, email: $('applicationEmail').value, type: 'Заявка в альянс' }) }).catch(() => {});
-      hideLoading(); message('Документ отправлен'); await loadDashboard(true);
+      
+      hideLoading(); 
+      message('Документ отправлен. Ожидайте одобрения.'); 
+      await loadDashboard(true);
+      showPage('dashboardPage');
     });
 
     $('topLogout').addEventListener('click', async () => { await db.auth.signOut(); localStorage.removeItem('theme'); location.reload(); });
     $('topAdmin').addEventListener('click', async () => { showLoading('Загрузка...'); await loadAdminData(); hideLoading(); showPage('adminPage'); });
     $('topCabinet').addEventListener('click', () => loadDashboard());
 
-    // ===== Подписка на события авторизации (ловит PASSWORD_RECOVERY) =====
     db.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         showPage('authPage');
@@ -2230,7 +2452,6 @@
       $('switchAuth').addEventListener('click', () => setMode('register'));
       setTimeout(checkAutoBlood19Sept, 500);
 
-      // Проверка: пришли ли мы по ссылке восстановления пароля
       const hash = window.location.hash || '';
       const isRecovery = hash.includes('type=recovery') || hash.includes('access_token');
       if (isRecovery) {
