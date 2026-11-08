@@ -410,7 +410,7 @@
   <main class="page">
     <header class="topbar">
       <p class="brand">
-        <img id="brandLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" alt="THEMAYSKIY">
+        <img id="brandLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png" alt="THEMAYSKIY">
       </p>
       <div class="top-actions">
         <button class="plain-button" id="btnAbout" onclick="showPage('aboutPage')">О нас</button>
@@ -479,7 +479,7 @@
             </div>
           </div>
           <div class="about-logo-box">
-            <img id="aboutLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png" alt="Logo">
+            <img id="aboutLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" alt="Logo">
             <div class="about-stamp">
               <img src="https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041015.png" alt="Stamp">
               <br>
@@ -1233,12 +1233,20 @@
     }
     function showLoading(t = 'Подождите...') { isProcessing = true; $('loadingText').textContent = t; $('loadingOverlay').classList.remove('hidden'); }
     function hideLoading() { isProcessing = false; $('loadingOverlay').classList.add('hidden'); }
+    
+    function updateAboutLogo() {
+      const aboutLogo = $('aboutLogo');
+      if (!aboutLogo) return;
+      const theme = document.body.getAttribute('data-theme');
+      if (theme === 'dark') aboutLogo.src = LOGO_LIGHT;
+      else aboutLogo.src = LOGO_DARK;
+    }
+
     function applyTheme(theme) {
       if (theme === 'system') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.body.setAttribute('data-theme', theme);
       updateBrand(); updateAssistantAvatar();
-      const aboutLogo = $('aboutLogo');
-      if (aboutLogo) aboutLogo.src = (theme === 'light' ? LOGO_DARK : LOGO_LIGHT);
+      updateAboutLogo();
     }
     function setTheme(theme) { localStorage.setItem('theme', theme); applyTheme(theme); closeThemeModal(); }
     function openThemeModal() {
@@ -1342,8 +1350,7 @@
 
     $('btnAbout').addEventListener('click', () => {
       showPage('aboutPage');
-      $('aboutLogo').src = (document.body.getAttribute('data-theme') === 'light' ? LOGO_DARK : LOGO_LIGHT);
-      $('aboutSignature').src = SIGNATURES[0]; 
+      updateAboutLogo();
     });
 
     function scheduleReload() {
