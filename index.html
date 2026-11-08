@@ -62,7 +62,6 @@
     .red-check:hover{transform:scale(1.15)}
     .black-check{display:inline-grid;place-items:center;width:20px;height:20px;margin-left:8px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:11px;font-weight:900;cursor:help}
     
-    /* Индикатор уведомления в меню */
     .notif-dot { display:inline-block; width:8px; height:8px; background:var(--red); border-radius:50%; margin-left:8px; vertical-align:middle; box-shadow:0 0 6px var(--red); animation:pulse 1.5s infinite; }
 
     .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
@@ -72,15 +71,8 @@
     details.section>summary::after{content:"+";color:var(--muted);font-size:18px; transition: transform 0.3s ease;}
     details.section[open]>summary::after{content:"−"; transform: rotate(180deg);}
     .section-content{padding:0 20px 20px;display:grid;gap:15px}
-    
-    /* Плавное появление контента в details */
-    details.section[open] .section-content {
-      animation: slideDown 0.3s ease-out forwards;
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    details.section[open] .section-content { animation: slideDown 0.3s ease-out forwards; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     .balance{color:var(--wine);font-size:32px;font-weight:800}
     body[data-theme="light"] .balance,body[data-theme="dark"] .balance{color:var(--ink)}
@@ -166,7 +158,6 @@
     #docModal,#themeModal,#resetModal,#buyAircraftModal,#memberProfileModal,#resetPasswordModal,#exitModal{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s ease;overflow-y:auto}
     #docModal.show,#themeModal.show,#resetModal.show,#buyAircraftModal.show,#memberProfileModal.show,#resetPasswordModal.show,#exitModal.show{opacity:1;pointer-events:auto}
     
-    /* Плавное появление модальных окон */
     .modal-content, .doc-paper, .assistant-chat {
       transform: scale(0.95);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
@@ -192,7 +183,6 @@
     .doc-paper .stamp{display:inline-block;border:none;padding:0;font-weight:bold;text-transform:uppercase;transform:rotate(-15deg);position:absolute;bottom:80px;left:90px;opacity:.8;font-family:Inter,sans-serif;text-align:center;border-radius:50%;width:140px;height:140px;display:flex;justify-content:center;align-items:center;flex-direction:column;line-height:1.2;font-size:14px}
     .doc-paper .stamp img { width: 100%; height: 100%; object-fit: contain; }
     
-    /* Красивый QR-код в документах */
     .doc-qr { position:absolute; bottom: 60px; right: 60px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:8px; z-index: 10;}
     .doc-qr img, .doc-qr canvas { width:90px !important; height:90px !important; margin-bottom:5px; display:block; }
     .doc-qr span { font-family:Inter,sans-serif; font-size:9px; color:#666; text-transform:uppercase; letter-spacing:.5px; text-align:center; }
@@ -291,7 +281,6 @@
     .print-profile .print-stamp { position:absolute; bottom: 60px; right: 50px; width: 150px; height: 150px; opacity: 0.8; }
     .print-profile .print-stamp img { width: 100%; height: 100%; object-fit: contain; transform: rotate(-15deg); }
 
-    /* Стили для страницы О нас */
     .about-block { display: flex; gap:30px; align-items:flex-start; flex-wrap:wrap; margin-bottom:30px; padding:30px; background:var(--soft); border-radius:16px; border:1px solid var(--line); position:relative; }
     .about-text { flex:1; min-width:300px; font-size:16px; line-height:1.6; text-align:justify; }
     .about-logo-box { flex: 0 0 200px; text-align:center; position:relative; }
@@ -410,7 +399,7 @@
   <main class="page">
     <header class="topbar">
       <p class="brand">
-        <img id="brandLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png" alt="THEMAYSKIY">
+        <img id="brandLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" alt="THEMAYSKIY">
       </p>
       <div class="top-actions">
         <button class="plain-button" id="btnAbout" onclick="showPage('aboutPage')">О нас</button>
@@ -479,7 +468,7 @@
             </div>
           </div>
           <div class="about-logo-box">
-            <img id="aboutLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" alt="Logo">
+            <img id="aboutLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png" alt="Logo">
             <div class="about-stamp">
               <img src="https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041015.png" alt="Stamp">
               <br>
@@ -1010,6 +999,8 @@
     const ADMIN_RANK = 'Главная Верховная Авиакомпания по управлению Альянсом и Майской экосистемой, флотом и бюджетом';
     const ADMIN_JOIN_DATE = '2016-01-01T00:00:00Z';
 
+    // 132642 = ЧЁРНЫЙ шрифт (для светлого фона / светлой темы)
+    // 132639 = БЕЛЫЙ шрифт (для тёмного фона / альянсовой и тёмной темы)
     const LOGO_DARK = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png';
     const LOGO_LIGHT = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png';
     const LOGO_BLOOD = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132645.png';
@@ -1125,7 +1116,7 @@
     }
 
     function getDocLogo() {
-      return localStorage.getItem('custom_doc_logo') || LOGO_LIGHT;
+      return localStorage.getItem('custom_doc_logo') || LOGO_LIGHT;  // LOGO_LIGHT = 132642 = чёрный, для белой бумаги
     }
     async function uploadDocLogo(event) {
       const file = event.target.files?.[0];
@@ -1195,12 +1186,16 @@
       localStorage.setItem('blood_19sept_shown', today);
       startBloodDemoInternal();
     }
+    
+    // ГЛАВНЫЙ ЛОГОТИП (шапка):
+    // Альянс/тёмная → БЕЛЫЙ (LOGO_DARK = 132639)
+    // Светлая → ЧЁРНЫЙ (LOGO_LIGHT = 132642)
     function updateBrand() {
       const img = $('brandLogo'); if (!img) return;
       let src;
       if (isBloodActive()) src = LOGO_BLOOD;
-      else if (document.body.getAttribute('data-theme') === 'light') src = LOGO_DARK;
-      else src = LOGO_LIGHT;
+      else if (document.body.getAttribute('data-theme') === 'light') src = LOGO_LIGHT;
+      else src = LOGO_DARK;
       img.src = src;
     }
     function updateAssistantAvatar() {
@@ -1234,12 +1229,15 @@
     function showLoading(t = 'Подождите...') { isProcessing = true; $('loadingText').textContent = t; $('loadingOverlay').classList.remove('hidden'); }
     function hideLoading() { isProcessing = false; $('loadingOverlay').classList.add('hidden'); }
     
+    // ЛОГОТИП "О НАС":
+    // Альянс/светлая → ЧЁРНЫЙ (LOGO_LIGHT = 132642)
+    // Тёмная → БЕЛЫЙ (LOGO_DARK = 132639)
     function updateAboutLogo() {
       const aboutLogo = $('aboutLogo');
       if (!aboutLogo) return;
       const theme = document.body.getAttribute('data-theme');
-      if (theme === 'dark') aboutLogo.src = LOGO_LIGHT;
-      else aboutLogo.src = LOGO_DARK;
+      if (theme === 'dark') aboutLogo.src = LOGO_DARK;
+      else aboutLogo.src = LOGO_LIGHT;
     }
 
     function applyTheme(theme) {
