@@ -154,15 +154,16 @@
     .pagination button:disabled{opacity:.4;cursor:not-allowed}
     .pagination .page-info{font-size:13px;color:var(--muted)}
     
-    #docModal,#themeModal,#resetModal,#buyAircraftModal,#memberProfileModal,#resetPasswordModal{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:.3s;overflow-y:auto}
-    #docModal.show,#themeModal.show,#resetModal.show,#buyAircraftModal.show,#memberProfileModal.show,#resetPasswordModal.show{opacity:1;pointer-events:auto}
+    #docModal,#themeModal,#resetModal,#buyAircraftModal,#memberProfileModal,#resetPasswordModal,#exitModal{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:.3s;overflow-y:auto}
+    #docModal.show,#themeModal.show,#resetModal.show,#buyAircraftModal.show,#memberProfileModal.show,#resetPasswordModal.show,#exitModal.show{opacity:1;pointer-events:auto}
     
     .doc-paper{background:#fff;width:100%;max-width:794px;min-height:1100px;padding:60px 90px 80px;box-shadow:0 10px 40px rgba(0,0,0,.5);position:relative;color:#000;font-family:'Times New Roman',Times,serif;text-align:justify;border-radius:20px}
     .doc-paper h2{text-align:center;text-transform:uppercase;letter-spacing:3px;margin-bottom:40px;border-bottom:2px solid #000;padding-bottom:15px;font-size:24px;color:#000}
     .doc-paper p{font-size:16px;line-height:1.8;margin-bottom:20px;text-indent:40px;position:relative;color:#000}
     .doc-paper .header-doc{display:flex;justify-content:space-between;margin-bottom:40px;font-size:14px;border-bottom:1px solid #ccc;padding-bottom:10px;font-family:Inter,sans-serif;text-transform:uppercase;font-weight:bold;color:#000}
     .doc-paper .signature{margin-top:100px;text-align:right;font-size:16px;font-style:italic;color:#000;padding-right: 120px;}
-    .doc-paper .stamp{display:inline-block;border:4px solid var(--red);color:var(--red);padding:15px 30px;font-weight:bold;text-transform:uppercase;transform:rotate(-15deg);position:absolute;bottom:80px;left:90px;opacity:.8;font-family:Inter,sans-serif;text-align:center;border-radius:50%;width:140px;height:140px;display:flex;justify-content:center;align-items:center;flex-direction:column;line-height:1.2;font-size:14px}
+    .doc-paper .stamp{display:inline-block;border:none;padding:0;font-weight:bold;text-transform:uppercase;transform:rotate(-15deg);position:absolute;bottom:80px;left:90px;opacity:.8;font-family:Inter,sans-serif;text-align:center;border-radius:50%;width:140px;height:140px;display:flex;justify-content:center;align-items:center;flex-direction:column;line-height:1.2;font-size:14px}
+    .doc-paper .stamp img { width: 100%; height: 100%; object-fit: contain; }
     
     /* Красивый QR-код в документах */
     .doc-qr { position:absolute; bottom: 60px; right: 60px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; padding:10px; border:1px solid #eee; border-radius:8px; z-index: 10;}
@@ -337,7 +338,6 @@
       body.printing-doc .doc-paper .signature { color: #000 !important; border-color: #000 !important; }
       body.printing-doc .doc-logo { display: block !important; visibility: visible !important; }
       
-      /* Гарантируем, что QR-код будет виден при печати */
       body.printing-doc .doc-qr { 
         display: flex !important; 
         visibility: visible !important; 
@@ -374,9 +374,11 @@
         <img id="brandLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" alt="THEMAYSKIY">
       </p>
       <div class="top-actions">
+        <button class="plain-button" id="btnAbout" onclick="showPage('aboutPage')">О нас</button>
         <button class="plain-button" id="btnSettings" onclick="openThemeModal()">Настройки</button>
         <button class="plain-button admin-btn hidden" id="topAdmin" type="button">Управление альянсом <span id="adminBadgeCount" class="badge-count hidden">0</span></button>
         <button class="plain-button hidden" id="topCabinet" type="button">В кабинет</button>
+        <button class="plain-button hidden" id="topExit" type="button" onclick="openExitModal()">Выйти из альянса</button>
         <button class="plain-button" id="topLogin" type="button">Войти</button>
         <button class="plain-button" id="topRegister" type="button">Регистрация</button>
         <button class="plain-button hidden" id="topLogout" type="button">Выйти</button>
@@ -425,6 +427,27 @@
           </div>
           <button class="primary" id="applicationSubmit" type="submit">Подать документ</button>
         </form>
+      </section>
+
+      <section id="aboutPage" class="hidden">
+        <h1>О нас</h1>
+        <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:30px; padding:20px; background:var(--soft); border-radius:16px;">
+          <img src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" style="max-width:200px; width:100%;">
+          <div style="flex:1; min-width:250px;">
+            <p style="font-size:16px; line-height:1.6; margin-bottom:15px;">Официальный портал Альянса THEMAYSKIY. Первый в истории СНГ автоматизированный ERP-портал виртуальной авиации. Все права на дизайн, лор и код защищены. Автор продукта: Майские авиалинии (c) <span id="aboutYear"></span></p>
+            <p style="margin-bottom:5px;"><b>Год создания:</b> 16.02.2016 (игровая версия)</p>
+            <p><b>Год создания:</b> 16.02.2024 (настоящая)</p>
+          </div>
+        </div>
+        
+        <h3 style="margin-bottom:15px; font-size:18px;">Значение логотипа альянса:</h3>
+        <ul style="font-size:15px; line-height:1.8; padding-left:20px; margin-bottom:30px;">
+          <li><b>Солнце:</b> Альянс всегда идет вперед, след за солнцем</li>
+          <li><b>Самолет:</b> Авиационный альянс</li>
+          <li><b>Венок:</b> Помощь другим (морально, физически и бюджетно) и благородие альянса</li>
+          <li><b>Ленточка:</b> Объединение всех в одну дружную семью</li>
+        </ul>
+        <button class="secondary" onclick="showPage('authPage')">Вернуться на главную</button>
       </section>
 
       <section id="dashboardPage" class="hidden">
@@ -503,6 +526,11 @@
             <details class="section" id="finesSection">
               <summary>Штрафы</summary>
               <div class="section-content"><div id="finesList">Загрузка...</div></div>
+            </details>
+
+            <details class="section" id="exitRequestSection">
+              <summary>🚪 Выход из альянса</summary>
+              <div class="section-content" id="exitRequestList">Загрузка...</div>
             </details>
 
             <details class="section">
@@ -713,6 +741,11 @@
           <div class="section-content" id="adminAppsList">Загрузка...</div>
         </details>
 
+        <details class="section" id="adminExitSection">
+          <summary>Заявки на выход</summary>
+          <div class="section-content" id="adminExitList">Загрузка...</div>
+        </details>
+
         <details class="section" id="adminCardsSection">
           <summary>Заявки на Карты</summary>
           <div class="section-content" id="adminCardsList">Загрузка...</div>
@@ -767,7 +800,7 @@
     </div>
 
     <footer class="footer">
-      <p>Сайт создан при помощи MAYs. Официальный сайт для регистрации авиакомпаний</p>
+      <p>(c)THEMAYskiy 2025-<span id="footerYear"></span>. Все права защищены.</p>
       <p><a onclick="showSupport()">Нашли проблему? нужна помощь? жмите!</a></p>
       <p>Почта: <a href="mailto:mayskiyrunway@gmail.com">mayskiyrunway@gmail.com</a></p>
     </footer>
@@ -894,6 +927,18 @@
     </div>
   </div>
 
+  <div id="exitModal" class="assistant-modal" onclick="if(event.target===this)closeExitModal()">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeExitModal()" style="color:var(--ink)">×</button>
+      <h3>Выход из альянса</h3>
+      <p class="muted" style="margin-bottom:15px; line-height:1.5;">Заполните заявление. <b>Внимание:</b> при выходе вы потеряете звание, все накопленные МайБиты (получение будет приостановлено), поддержку от Майских авиалиний и альянса. Ваши дочерние компании и праздники также будут аннулированы.</p>
+      <div class="field"><label>Название авиакомпании</label><input id="exitCompany" readonly style="background:var(--soft)"></div>
+      <div class="field"><label>Причина выхода</label><textarea id="exitReason" placeholder="Почему ваша авиакомпания уходит?"></textarea></div>
+      <button class="primary" id="btnSubmitExit" onclick="submitExitRequest()" style="margin-top:15px">Отправить заявление</button>
+      <button class="secondary" onclick="closeExitModal()" style="margin-top:5px;width:100%">Отмена</button>
+    </div>
+  </div>
+
   <script>
     'use strict';
 
@@ -902,6 +947,11 @@
         vkBridge.send('VKWebAppInit').then(function(data){ if (data.result) console.log("VK Bridge запущен!"); })
         .catch(function(error){ console.error("VK Bridge ошибка:", error); });
       } else { console.error("Библиотека VK Bridge не найдена!"); }
+      
+      // Устанавливаем года в футере и "О нас"
+      const currentYear = new Date().getFullYear();
+      if ($('footerYear')) $('footerYear').textContent = currentYear;
+      if ($('aboutYear')) $('aboutYear').textContent = currentYear;
     });
 
     const SUPABASE_URL = 'https://qyabbiyhvwiafprolzoh.supabase.co';
@@ -919,6 +969,24 @@
     
     const ASSISTANT_NORMAL = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F151_20261103131909.png';
     const ASSISTANT_BLOOD = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F151_20261103131912.png';
+
+    // Массив подписей (росписей)
+    const SIGNATURES = [
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041030.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041034.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041038.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041042.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041046.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041054.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041100.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041104.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041108.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041112.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041117.png',
+      'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041122.png'
+    ];
+
+    const STAMP_URL = 'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041015.png';
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const $ = id => document.getElementById(id);
@@ -1144,14 +1212,23 @@
 
     function showSupport() { location.href = 'mailto:mayskiyrunway@gmail.com?subject=Проблема%20на%20сайте%20THEMAYSKIY&body=Опишите%20проблему...'; }
     function message(text, error = false) { const el = $('notice'); el.textContent = text; el.className = 'notice show' + (error ? ' error' : ''); window.scrollTo(0, 0); }
+    
     function showPage(name) {
-      ['authPage', 'applicationPage', 'dashboardPage', 'adminPage'].forEach(p => $(p).classList.add('hidden'));
+      ['authPage', 'applicationPage', 'dashboardPage', 'adminPage', 'aboutPage'].forEach(p => $(p).classList.add('hidden'));
       $(name).classList.remove('hidden');
-      $('topLogin').classList.toggle('hidden', name !== 'authPage');
-      $('topRegister').classList.toggle('hidden', name !== 'authPage');
-      $('topLogout').classList.toggle('hidden', name === 'authPage');
-      $('topAdmin').classList.toggle('hidden', !isAdmin || name === 'adminPage' || name === 'authPage');
+      
+      const isAuth = name === 'authPage';
+      const isAbout = name === 'aboutPage';
+      
+      $('topLogin').classList.toggle('hidden', !isAuth && !isAbout);
+      $('topRegister').classList.toggle('hidden', !isAuth && !isAbout);
+      $('topLogout').classList.toggle('hidden', isAuth || isAbout);
+      $('btnSettings').classList.toggle('hidden', isAuth || isAbout);
+      $('btnAbout').classList.toggle('hidden', !isAuth && !isAbout && name !== 'dashboardPage'); 
+      
+      $('topAdmin').classList.toggle('hidden', !isAdmin || name === 'adminPage' || isAuth || isAbout);
       $('topCabinet').classList.toggle('hidden', !isAdmin || name !== 'adminPage');
+      $('topExit').classList.toggle('hidden', name !== 'dashboardPage' || isAdmin || !userProfile?.joined_at);
     }
 
     function setMfaMode(visible) {
@@ -1202,7 +1279,7 @@
     }
     function setupRealtime() {
       const channel = db.channel('custom-all-channel');
-      ['transactions', 'profiles', 'applications', 'fines', 'posts', 'loans', 'aircraft_orders', 'user_fleet', 'maysk_requests', 'registry_applications', 'subsidiaries', 'hidden_holidays', 'admin_logs'].forEach(table => {
+      ['transactions', 'profiles', 'applications', 'fines', 'posts', 'loans', 'aircraft_orders', 'user_fleet', 'maysk_requests', 'registry_applications', 'subsidiaries', 'hidden_holidays', 'admin_logs', 'exit_requests'].forEach(table => {
         channel.on('postgres_changes', { event: '*', schema: 'public', table }, scheduleReload);
       });
       channel.subscribe();
@@ -1235,14 +1312,15 @@
     async function updateAdminBadge() {
       if (!isAdmin) return;
       try {
-        const [apps, regs, maysks, subs, cards] = await Promise.all([
+        const [apps, regs, maysks, subs, cards, exits] = await Promise.all([
           db.from('applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           db.from('registry_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           db.from('maysk_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           db.from('subsidiaries').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-          db.from('profiles').select('id', { count: 'exact', head: true }).eq('card_status', 'pending')
+          db.from('profiles').select('id', { count: 'exact', head: true }).eq('card_status', 'pending'),
+          db.from('exit_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
         ]);
-        const total = (apps.count||0)+(regs.count||0)+(maysks.count||0)+(subs.count||0)+(cards.count||0);
+        const total = (apps.count||0)+(regs.count||0)+(maysks.count||0)+(subs.count||0)+(cards.count||0)+(exits.count||0);
         const badge = $('adminBadgeCount');
         if (badge) { badge.textContent = total; badge.classList.toggle('hidden', total === 0); }
       } catch (e) { console.error(e); }
@@ -1811,6 +1889,14 @@
         await checkOverdueLoanFines();
 
         let { data: profile } = await db.from('profiles').select('*').eq('id', user.id).maybeSingle();
+        
+        // --- ГЕНЕРАЦИЯ ПОДПИСИ (если нет) ---
+        if (profile && !profile.signature_url) {
+            const randomSig = SIGNATURES[Math.floor(Math.random() * SIGNATURES.length)];
+            await db.from('profiles').update({ signature_url: randomSig }).eq('id', user.id);
+            profile.signature_url = randomSig;
+        }
+
         userProfile = profile;
         if (profile?.blood_effects !== undefined && profile?.blood_effects !== null) localStorage.setItem('blood_effects', profile.blood_effects ? 'true' : 'false');
         updateBrand(); updateAssistantAvatar();
@@ -1828,6 +1914,8 @@
           $('finesSection').classList.add('hidden');
           $('docFolders').classList.add('hidden');
           $('newsSection').classList.add('hidden');
+          $('exitRequestSection').classList.add('hidden');
+          $('topExit').classList.add('hidden');
         } else {
           $('balanceAmount').textContent = Number(profile?.balance || 0).toLocaleString('ru-RU');
           $('rankDisplay').textContent = profile?.rank || 'Участник'; $('rankDisplay').style.fontSize = '';
@@ -1835,12 +1923,17 @@
           $('finesSection').classList.remove('hidden');
           $('docFolders').classList.remove('hidden');
           $('newsSection').classList.remove('hidden');
+          $('exitRequestSection').classList.remove('hidden');
+          $('topExit').classList.toggle('hidden', !profile?.joined_at);
+
           let joinedAt = profile?.joined_at ? new Date(profile.joined_at) : null;
           if (!joinedAt) { const { data: app } = await db.from('applications').select('approved_at').eq('user_id', user.id).eq('status', 'approved').maybeSingle(); if (app?.approved_at) { joinedAt = new Date(app.approved_at); await db.from('profiles').update({ joined_at: app.approved_at }).eq('id', user.id); } }
           if (joinedAt) { const days = Math.floor((Date.now() - joinedAt.getTime()) / 86400000); $('statTime').textContent = `В альянсе: ${days.toLocaleString('ru-RU')} ${pluralDays(days)}`; $('statDate').textContent = `Дата вступления: ${joinedAt.toLocaleDateString('ru-RU')}`; }
           else { $('statTime').textContent = 'В альянсе: не состоит'; $('statDate').textContent = 'Дата вступления: —'; }
           await loadLoans();
           await loadCardStatus();
+          await loadExitRequest();
+          
           const joined = profile?.joined_at != null;
           const bdaySaveBtn = $('btnSaveBirthday'), bdayRemoveBtn = $('btnRemoveBirthday'), bdayInput = $('userBirthday'), bdayHint = $('birthdayHint');
           if (joined) { bdaySaveBtn.disabled = false; bdaySaveBtn.style.opacity = ''; bdaySaveBtn.style.cursor = ''; bdaySaveBtn.textContent = 'Сохранить'; bdayRemoveBtn.disabled = false; bdayRemoveBtn.style.opacity = ''; bdayInput.disabled = false; bdayInput.style.opacity = ''; if (bdayHint) bdayHint.textContent = ''; }
@@ -1910,6 +2003,102 @@
       }
     }
 
+    async function loadExitRequest() {
+      const content = $('exitRequestList');
+      if (!content || !currentUser) return;
+      
+      const { data: reqs } = await db.from('exit_requests').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      
+      if (reqs && reqs.length > 0) {
+        const req = reqs[0];
+        if (req.status === 'pending') {
+            content.innerHTML = `<p style="color:var(--accent)">⏳ Заявка на выход подана и находится на рассмотрении.</p>`;
+        } else if (req.status === 'approved') {
+            content.innerHTML = `<p style="color:var(--red); font-weight:bold;">Вы вышли из альянса.</p>
+            <button class="secondary" style="margin-top:10px;" onclick="showExitDocument()">Посмотреть документ</button>`;
+        }
+      } else {
+        content.innerHTML = `<p class="muted">Вы можете выйти из альянса, заполнив заявление.</p>
+        <button class="primary" style="background:var(--red);" onclick="openExitModal()">Подать заявление</button>`;
+      }
+    }
+
+    function openExitModal() {
+        if (!userProfile) return;
+        $('exitCompany').value = userProfile.company_name;
+        $('exitReason').value = '';
+        $('exitModal').classList.add('show');
+    }
+    function closeExitModal() {
+        $('exitModal').classList.remove('show');
+    }
+    async function submitExitRequest() {
+        if (!currentUser || !userProfile) return;
+        const reason = $('exitReason').value.trim();
+        if (!reason) return message('Укажите причину выхода', true);
+        
+        $('btnSubmitExit').disabled = true;
+        $('btnSubmitExit').textContent = 'Отправка...';
+        showLoading('Отправка...');
+        
+        const { error } = await db.from('exit_requests').insert({
+            user_id: currentUser.id,
+            company_name: userProfile.company_name,
+            reason: reason,
+            status: 'pending'
+        });
+        
+        hideLoading();
+        $('btnSubmitExit').disabled = false;
+        $('btnSubmitExit').textContent = 'Отправить заявление';
+        
+        if (error) return message(error.message, true);
+        
+        message('Заявление на выход отправлено.');
+        closeExitModal();
+        await loadExitRequest();
+    }
+
+    // Функция для отображения документа о выходе (для пользователя)
+    window.showExitDocument = async () => {
+        if (!currentUser || !userProfile) return;
+        const { data: reqs } = await db.from('exit_requests').select('*').eq('user_id', currentUser.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(1);
+        if (!reqs || reqs.length === 0) return message('Одобренная заявка не найдена', true);
+        
+        const req = reqs[0];
+        const docLogo = getDocLogo();
+        const siteUrl = window.location.origin;
+        const qrBlock = `<div class="doc-qr"><div id="docQrContainer"></div><span>Сайт Альянса</span></div>`;
+        const date = new Date(req.approved_at || req.created_at).toLocaleDateString('ru-RU');
+        const num = `№ ${Math.floor(Math.random() * 10000)}-EXIT`;
+
+        const html = `
+            <img src="${docLogo}" class="doc-logo" alt="logo" onerror="this.style.display='none'">
+            <div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div>
+            <h2>Выход из альянса: THEMAYSKIY</h2>
+            <p>Настоящим документом подтверждается, что авиакомпания <strong>${esc(req.company_name)}</strong> официально вышла из состава Альянса THEMAYSKIY.</p>
+            <p><strong>Причина:</strong> ${esc(req.reason)}</p>
+            <p>При выходе авиакомпания теряет звание, право на получение МайБитов, поддержку от Майских авиалиний и Альянса. Все дочерние компании и добавленные праздники аннулируются.</p>
+            <div class="signature">
+                <p>Глава Альянса</p>
+                <img src="${userProfile.signature_url || ''}" style="max-width:150px; display:block; margin-left:auto;">
+            </div>
+            <div class="stamp"><img src="${STAMP_URL}"></div>
+            ${qrBlock}
+        `;
+
+        $('docContent').innerHTML = html;
+        $('docModal').classList.add('show');
+
+        setTimeout(() => {
+            const qrEl = $('docQrContainer');
+            if (qrEl) {
+                qrEl.innerHTML = '';
+                new QRCode(qrEl, { text: siteUrl, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+            }
+        }, 100);
+    };
+
     async function updateRegistryButtons() {
       if (!currentUser || isAdmin) return;
       const mainApproved = userProfile?.registry_status === 'approved';
@@ -1969,10 +2158,16 @@
       const { data: allPosts } = await db.from('posts').select('*').order('created_at', { ascending: false }).limit(30);
       $('adminPostsList').innerHTML = allPosts?.length ? allPosts.map(p => `<div class="post-card"><button class="post-delete-btn" onclick="deletePost('${esc(p.id)}')" title="Удалить">×</button><div class="post-header"><strong>${esc(p.author_name)}</strong><span>${new Date(p.created_at).toLocaleString()}</span></div><div class="post-content">${esc(p.content)}</div></div>`).join('') : 'Нет постов.';
 
+      // Заявки на вступление
       const { data: apps } = await db.from('applications').select('*').order('created_at', { ascending: false });
       const pendingApps = apps?.filter(a => a.status === 'pending').length || 0;
       updateSectionBadge('adminAppsSection', pendingApps);
       $('adminAppsList').innerHTML = apps?.map(a => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(a.company_name)}</h4><p class="muted">${esc(a.contact_email)}</p></div>${a.status === 'pending' ? `<div class="admin-actions"><button class="primary" onclick="approveApp('${esc(a.id)}','${esc(a.user_id)}')">Принять</button><button class="secondary" onclick="rejectApp('${esc(a.id)}')">Отказать</button></div>` : esc(a.status)}</div>`).join('') || 'Нет заявок.';
+
+      // Заявки на выход
+      const { data: exits } = await db.from('exit_requests').select('*').eq('status', 'pending');
+      updateSectionBadge('adminExitSection', exits?.length || 0);
+      $('adminExitList').innerHTML = exits?.length ? exits.map(e => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(e.company_name)}</h4><p class="muted">Причина: ${esc(e.reason)}</p></div><div class="admin-actions"><button class="primary" style="background:var(--red);" onclick="approveExit('${esc(e.id)}', '${esc(e.user_id)}')">Одобрить выход</button></div></div>`).join('') : 'Нет заявок.';
 
       const { data: cards } = await db.from('profiles').select('id,company_name,card_number,avatar_url').eq('card_status', 'pending');
       updateSectionBadge('adminCardsSection', cards?.length || 0);
@@ -2026,6 +2221,50 @@
       $('adminFineTarget').innerHTML = options || '<option value="">—</option>';
       $('adminBalanceTarget').innerHTML = options || '<option value="">—</option>';
     }
+
+    // ОДОБРЕНИЕ ВЫХОДА
+    window.approveExit = async (requestId, userId) => {
+        if (isProcessing) return;
+        if (!confirm('Одобрить выход этой авиакомпании? Все её дочерние компании, реестр и праздники будут аннулированы.')) return;
+        showLoading('Оформление выхода...');
+        try {
+            // 1. Меняем статус заявки
+            await db.from('exit_requests').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', requestId);
+            
+            // 2. Очищаем профиль
+            await db.from('profiles').update({ 
+                joined_at: null, 
+                rank: 'Участник', 
+                registry_status: null, 
+                birthday_date: null, 
+                signature_url: null // Сбрасываем подпись, чтобы при возвращении выпала новая
+            }).eq('id', userId);
+
+            // 3. Удаляем заявки в Майск и реестр
+            await db.from('maysk_requests').delete().eq('user_id', userId);
+            await db.from('registry_applications').delete().eq('user_id', userId);
+
+            // 4. Удаляем праздники (скрытые дни рождения)
+            await db.from('hidden_holidays').delete().eq('holiday_key', 'birthday_' + userId);
+
+            // 5. Удаляем дочерние компании
+            const { data: subs } = await db.from('subsidiaries').select('id').or(`parent_id.eq.${userId},user_id.eq.${userId}`);
+            if (subs && subs.length > 0) {
+                const subIds = subs.map(s => s.id);
+                await db.from('registry_applications').delete().in('subsidiary_id', subIds);
+                await db.from('subsidiaries').delete().in('id', subIds);
+            }
+
+            hideLoading();
+            await logAdminAction('Одобрен выход из альянса', null, userId);
+            message('Выход одобрен. Все данные аннулированы.');
+            await loadAdminData();
+            await updateAdminBadge();
+        } catch(err) {
+            hideLoading();
+            message('Ошибка при одобрении выхода: ' + err.message, true);
+        }
+    };
 
     window.approveCard = async (userId) => {
       if (!confirm('Одобрить карту?')) return;
@@ -2320,7 +2559,6 @@
       const docLogo = getDocLogo();
       
       const siteUrl = window.location.origin;
-      // Контейнер для QR-кода. Генерируем позже через JS.
       const qrBlock = `<div class="doc-qr"><div id="docQrContainer"></div><span>Сайт Альянса</span></div>`;
 
       const logoTop = `<img src="${docLogo}" class="doc-logo" alt="logo" onerror="this.style.display='none'">`;
@@ -2330,36 +2568,31 @@
         if (!data?.length) return message('Разрешение появится после одобрения', true);
       }
       
+      const sigImg = userProfile?.signature_url ? `<img src="${userProfile.signature_url}" style="max-width:150px; display:block; margin-left:auto;">` : '_________________';
+      const stampImg = `<div class="stamp"><img src="${STAMP_URL}"></div>`;
+
       if (type === 'alliance') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Свидетельство о вступлении</h2><p>Настоящим официальным документом удостоверяется, что авиакомпания <strong>${company}</strong> (Код: ${code}) является участником <strong>THEMAYSKIY</strong>.</p><p>Авиакомпания обязуется соблюдать устав альянса и вносить вклад в развитие экосистемы.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Утверждено<br>Главой Альянса</div>${qrBlock}`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Свидетельство о вступлении</h2><p>Настоящим официальным документом удостоверяется, что авиакомпания <strong>${company}</strong> (Код: ${code}) является участником <strong>THEMAYSKIY</strong>.</p><p>Авиакомпания обязуется соблюдать устав альянса и вносить вклад в развитие экосистемы.</p><div class="signature"><p>Глава Альянса</p>${sigImg}</div>${stampImg}${qrBlock}`;
       } else if (type === 'subsidiaries') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Реестр дочерних компаний</h2><p>Настоящий документ подтверждает наличие дочерних компаний под управлением <strong>${company}</strong> (Код: ${code}).</p><div id="docSubsList">Загрузка...</div><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Официальный<br>реестр</div>${qrBlock}`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Реестр дочерних компаний</h2><p>Настоящий документ подтверждает наличие дочерних компаний под управлением <strong>${company}</strong> (Код: ${code}).</p><div id="docSubsList">Загрузка...</div><div class="signature"><p>Глава Альянса</p>${sigImg}</div>${stampImg}${qrBlock}`;
         setTimeout(async () => {
           const { data } = await db.from('subsidiaries').select('company_name').eq('parent_id', currentUser.id).eq('status', 'approved');
           const el = $('docSubsList');
           if (el) el.innerHTML = data?.length ? '<ul>' + data.map(s => `<li>${esc(s.company_name)}</li>`).join('') + '</ul>' : 'Нет дочек';
         }, 0);
       } else if (type === 'registry') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Выписка из Реестра</h2><p>Авиакомпания <strong>${company}</strong> (Код: ${code}) зарегистрирована в реестре <strong>"Майские компании"</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Майские<br>Компании</div>${qrBlock}`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Выписка из Реестра</h2><p>Авиакомпания <strong>${company}</strong> (Код: ${code}) зарегистрирована в реестре <strong>"Майские компании"</strong>.</p><div class="signature"><p>Глава Альянса</p>${sigImg}</div>${stampImg}${qrBlock}`;
       } else if (type === 'maysk') {
-        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Разрешение на полеты</h2><p>Настоящий документ подтверждает, что авиакомпании <strong>${company}</strong> (Код: ${code}) разрешено выполнять рейсы в город <strong>Майск</strong>.</p><div class="signature"><p>Глава Альянса<br>_________________</p></div><div class="stamp">Полет<br>Разрешен</div>${qrBlock}`;
+        html = `${logoTop}<div class="header-doc"><span>АЛЬЯНС THEMAYSKIY</span><span>Дата: ${date} | Док: ${num}</span></div><h2>Разрешение на полеты</h2><p>Настоящий документ подтверждает, что авиакомпании <strong>${company}</strong> (Код: ${code}) разрешено выполнять рейсы в город <strong>Майск</strong>.</p><div class="signature"><p>Глава Альянса</p>${sigImg}</div>${stampImg}${qrBlock}`;
       }
       $('docContent').innerHTML = html;
       $('docModal').classList.add('show');
 
-      // Генерируем QR-код через библиотеку (он рисуется в canvas внутри div)
       setTimeout(() => {
         const qrEl = $('docQrContainer');
         if (qrEl) {
           qrEl.innerHTML = '';
-          new QRCode(qrEl, {
-            text: siteUrl,
-            width: 90,
-            height: 90,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-          });
+          new QRCode(qrEl, { text: siteUrl, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         }
       }, 100);
     };
