@@ -6,7 +6,6 @@
   <title>THEMAYSKIY — Официальный Альянс</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" defer></script>
-  <!-- Библиотека для генерации QR-кодов прямо в браузере -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -70,9 +69,19 @@
     details.section{border:1px solid var(--line);background:var(--paper);margin-bottom:15px;border-radius:16px;overflow:hidden}
     details.section>summary{padding:17px 20px;cursor:pointer;font-size:14px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
     details.section>summary::-webkit-details-marker{display:none}
-    details.section>summary::after{content:"+";color:var(--muted);font-size:18px}
-    details.section[open]>summary::after{content:"−"}
+    details.section>summary::after{content:"+";color:var(--muted);font-size:18px; transition: transform 0.3s ease;}
+    details.section[open]>summary::after{content:"−"; transform: rotate(180deg);}
     .section-content{padding:0 20px 20px;display:grid;gap:15px}
+    
+    /* Плавное появление контента в details */
+    details.section[open] .section-content {
+      animation: slideDown 0.3s ease-out forwards;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .balance{color:var(--wine);font-size:32px;font-weight:800}
     body[data-theme="light"] .balance,body[data-theme="dark"] .balance{color:var(--ink)}
     .muted{color:var(--muted);font-size:13px;line-height:1.5}
@@ -154,9 +163,27 @@
     .pagination button:disabled{opacity:.4;cursor:not-allowed}
     .pagination .page-info{font-size:13px;color:var(--muted)}
     
-    #docModal,#themeModal,#resetModal,#buyAircraftModal,#memberProfileModal,#resetPasswordModal,#exitModal{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:.3s;overflow-y:auto}
+    #docModal,#themeModal,#resetModal,#buyAircraftModal,#memberProfileModal,#resetPasswordModal,#exitModal{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s ease;overflow-y:auto}
     #docModal.show,#themeModal.show,#resetModal.show,#buyAircraftModal.show,#memberProfileModal.show,#resetPasswordModal.show,#exitModal.show{opacity:1;pointer-events:auto}
     
+    /* Плавное появление модальных окон */
+    .modal-content, .doc-paper, .assistant-chat {
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      opacity: 0;
+    }
+    #docModal.show .doc-paper,
+    #themeModal.show .modal-content,
+    #resetModal.show .modal-content,
+    #buyAircraftModal.show .modal-content,
+    #memberProfileModal.show .modal-content,
+    #resetPasswordModal.show .modal-content,
+    #exitModal.show .modal-content,
+    .assistant-modal.show .assistant-chat {
+      transform: scale(1);
+      opacity: 1;
+    }
+
     .doc-paper{background:#fff;width:100%;max-width:794px;min-height:1100px;padding:60px 90px 80px;box-shadow:0 10px 40px rgba(0,0,0,.5);position:relative;color:#000;font-family:'Times New Roman',Times,serif;text-align:justify;border-radius:20px}
     .doc-paper h2{text-align:center;text-transform:uppercase;letter-spacing:3px;margin-bottom:40px;border-bottom:2px solid #000;padding-bottom:15px;font-size:24px;color:#000}
     .doc-paper p{font-size:16px;line-height:1.8;margin-bottom:20px;text-indent:40px;position:relative;color:#000}
@@ -261,7 +288,19 @@
     .print-profile .print-footer{margin-top:60px;padding-top:20px;border-top:2px solid #000;text-align:center;display:flex;align-items:center;justify-content:center;gap:15px}
     .print-profile .print-footer img{max-width:50px}
     .print-profile .print-footer p{font-size:12px;color:#666;letter-spacing:.1em;text-transform:uppercase;margin:0}
-    
+    .print-profile .print-stamp { position:absolute; bottom: 60px; right: 50px; width: 150px; height: 150px; opacity: 0.8; }
+    .print-profile .print-stamp img { width: 100%; height: 100%; object-fit: contain; transform: rotate(-15deg); }
+
+    /* Стили для страницы О нас */
+    .about-block { display: flex; gap:30px; align-items:flex-start; flex-wrap:wrap; margin-bottom:30px; padding:30px; background:var(--soft); border-radius:16px; border:1px solid var(--line); position:relative; }
+    .about-text { flex:1; min-width:300px; font-size:16px; line-height:1.6; text-align:justify; }
+    .about-logo-box { flex: 0 0 200px; text-align:center; position:relative; }
+    .about-logo-box img { width:100%; margin-bottom:15px; }
+    .about-stamp { position: relative; margin-top:20px; }
+    .about-stamp img { width:120px; opacity:0.8; transform: rotate(-15deg); }
+    .about-list { font-size:15px; line-height:1.8; padding-left:20px; margin-bottom:30px; }
+    .about-list li { margin-bottom: 8px; }
+
     body.mobile-mode .page { width: min(100% - 12px, 1100px) !important; padding: 14px 0 42px !important; }
     body.mobile-mode .dashboard-grid,
     body.mobile-mode .folders-container,
@@ -431,23 +470,32 @@
 
       <section id="aboutPage" class="hidden">
         <h1>О нас</h1>
-        <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:30px; padding:20px; background:var(--soft); border-radius:16px;">
-          <img src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132639.png" style="max-width:200px; width:100%;">
-          <div style="flex:1; min-width:250px;">
-            <p style="font-size:16px; line-height:1.6; margin-bottom:15px;">Официальный портал Альянса THEMAYSKIY. Первый в истории СНГ автоматизированный ERP-портал виртуальной авиации. Все права на дизайн, лор и код защищены. Автор продукта: Майские авиалинии (c) <span id="aboutYear"></span></p>
-            <p style="margin-bottom:5px;"><b>Год создания:</b> 16.02.2016 (игровая версия)</p>
-            <p><b>Год создания:</b> 16.02.2024 (настоящая)</p>
+        <div class="about-block">
+          <div class="about-text">
+            <p>Официальный портал Альянса THEMAYSKIY. Первый в истории СНГ автоматизированный ERP-портал виртуальной авиации. Все права на дизайн, лор и код защищены. Автор продукта: Майские авиалинии (c) <span id="aboutYear"></span></p>
+            <div style="margin-top:20px; padding:15px; background:var(--paper); border-radius:12px; border-left:4px solid var(--accent);">
+              <p style="margin-bottom:5px;"><b>Год создания:</b> 16.02.2016 (игровая версия)</p>
+              <p><b>Год создания:</b> 16.02.2024 (настоящая)</p>
+            </div>
+          </div>
+          <div class="about-logo-box">
+            <img id="aboutLogo" src="https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F146_20261103132642.png" alt="Logo">
+            <div class="about-stamp">
+              <img src="https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041015.png" alt="Stamp">
+              <br>
+              <img id="aboutSignature" src="https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041030.png" alt="Signature" style="max-width:120px; margin-top:10px;">
+            </div>
           </div>
         </div>
         
         <h3 style="margin-bottom:15px; font-size:18px;">Значение логотипа альянса:</h3>
-        <ul style="font-size:15px; line-height:1.8; padding-left:20px; margin-bottom:30px;">
+        <ul class="about-list">
           <li><b>Солнце:</b> Альянс всегда идет вперед, след за солнцем</li>
           <li><b>Самолет:</b> Авиационный альянс</li>
           <li><b>Венок:</b> Помощь другим (морально, физически и бюджетно) и благородие альянса</li>
           <li><b>Ленточка:</b> Объединение всех в одну дружную семью</li>
         </ul>
-        <button class="secondary" onclick="showPage('authPage')">Вернуться на главную</button>
+        <button class="secondary" onclick="showPage(isAdmin ? 'adminPage' : (currentUser ? 'dashboardPage' : 'authPage'))">Назад</button>
       </section>
 
       <section id="dashboardPage" class="hidden">
@@ -800,7 +848,7 @@
     </div>
 
     <footer class="footer">
-      <p>(c)THEMAYskiy 2025-<span id="footerYear"></span>. Все права защищены.</p>
+      <p>© THEMAYskiy 2025-<span id="footerYear"></span></p>
       <p><a onclick="showSupport()">Нашли проблему? нужна помощь? жмите!</a></p>
       <p>Почта: <a href="mailto:mayskiyrunway@gmail.com">mayskiyrunway@gmail.com</a></p>
     </footer>
@@ -948,7 +996,6 @@
         .catch(function(error){ console.error("VK Bridge ошибка:", error); });
       } else { console.error("Библиотека VK Bridge не найдена!"); }
       
-      // Устанавливаем года в футере и "О нас"
       const currentYear = new Date().getFullYear();
       if ($('footerYear')) $('footerYear').textContent = currentYear;
       if ($('aboutYear')) $('aboutYear').textContent = currentYear;
@@ -970,7 +1017,6 @@
     const ASSISTANT_NORMAL = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F151_20261103131909.png';
     const ASSISTANT_BLOOD = 'https://raw.githubusercontent.com/balovzena9-ops/MYRUN-store/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F151_20261103131912.png';
 
-    // Массив подписей (росписей)
     const SIGNATURES = [
       'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041030.png',
       'https://raw.githubusercontent.com/balovzena9-ops/mozno-da/main/%D0%91%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F161_20261108041034.png',
@@ -1050,10 +1096,33 @@
       { q: "Как выйти из аккаунта?", a: "Нажмите кнопку «Выйти» в правом верхнем углу сайта. Это безопасно завершит сессию.", highlight: '#topLogout' },
       { q: "Как стать заместителем альянса?", a: "Звание в альянсе назначает лично глава — «Майские авиалинии». Покажи себя активным участником, помогай альянсу и заслужи доверие.", highlight: null },
       { q: "Что делать если забыл пароль?", a: "На экране входа нажми «Забыли пароль?». Введи свою почту, и мы отправим ссылку для восстановления.", highlight: null },
-      { q: "Как изменить аватар компании?", a: "В верхней части кабинета рядом с вашим аватаром есть кнопка «Сменить фото». Нажми её и выбери картинку.", highlight: null }
+      { q: "Как изменить аватар компании?", a: "В верхней части кабинета рядом с вашим аватаром есть кнопка «Сменить фото». Нажми её и выбери картинку.", highlight: null },
+      { q: "Как сменить пароль?", a: "В вашем кабинете откройте раздел «🔐 Сменить пароль». Введите текущий и новый пароль.", highlight: '#newPass' },
+      { q: "Где скачать документы?", a: "Внизу вашего кабинета есть папки: Альянс, Дочерние, Реестр и Майск. Нажмите на нужную, чтобы открыть документ и распечатать его.", highlight: '.folders-container' },
+      { q: "Как распечатать профиль?", a: "В верхней части кабинета, рядом с вашим аватаром, есть кнопка «🖨 Печать». Она сгенерирует официальный бланк вашей компании.", highlight: 'button[onclick="printProfile()"]' },
+      { q: "Как выйти из альянса?", a: "В верхней панели нажмите «Выйти из альянса». Заполните заявление, и после одобрения главой альянса вы покинете его.", highlight: '#topExit' },
+      { q: "Где посмотреть других участников?", a: "В разделе «👥 Участники альянса» вы можете найти любую компанию по названию или коду.", highlight: '#membersSection' }
     ];
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    async function getSignatureForDoc(docType) {
+      if (!userProfile) return SIGNATURES[0];
+      let sigMap = userProfile.signature_map || {};
+      if (typeof sigMap === 'string') {
+          try { sigMap = JSON.parse(sigMap); } catch(e) { sigMap = {}; }
+      }
+      if (sigMap[docType]) return sigMap[docType];
+      
+      const usedSigs = Object.values(sigMap);
+      const availableSigs = SIGNATURES.filter(s => !usedSigs.includes(s));
+      const newSig = availableSigs.length > 0 ? availableSigs[0] : SIGNATURES[Math.floor(Math.random() * SIGNATURES.length)];
+      
+      sigMap[docType] = newSig;
+      await db.from('profiles').update({ signature_map: sigMap }).eq('id', currentUser.id);
+      userProfile.signature_map = sigMap;
+      return newSig;
+    }
 
     function getDocLogo() {
       return localStorage.getItem('custom_doc_logo') || LOGO_LIGHT;
@@ -1130,8 +1199,8 @@
       const img = $('brandLogo'); if (!img) return;
       let src;
       if (isBloodActive()) src = LOGO_BLOOD;
-      else if (document.body.getAttribute('data-theme') === 'light') src = LOGO_LIGHT;
-      else src = LOGO_DARK;
+      else if (document.body.getAttribute('data-theme') === 'light') src = LOGO_DARK;
+      else src = LOGO_LIGHT;
       img.src = src;
     }
     function updateAssistantAvatar() {
@@ -1168,6 +1237,8 @@
       if (theme === 'system') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.body.setAttribute('data-theme', theme);
       updateBrand(); updateAssistantAvatar();
+      const aboutLogo = $('aboutLogo');
+      if (aboutLogo) aboutLogo.src = (theme === 'light' ? LOGO_DARK : LOGO_LIGHT);
     }
     function setTheme(theme) { localStorage.setItem('theme', theme); applyTheme(theme); closeThemeModal(); }
     function openThemeModal() {
@@ -1220,11 +1291,12 @@
       const isAuth = name === 'authPage';
       const isAbout = name === 'aboutPage';
       
-      $('topLogin').classList.toggle('hidden', !isAuth && !isAbout);
-      $('topRegister').classList.toggle('hidden', !isAuth && !isAbout);
-      $('topLogout').classList.toggle('hidden', isAuth || isAbout);
+      $('topLogin').classList.toggle('hidden', !isAuth);
+      $('topRegister').classList.toggle('hidden', !isAuth);
+      $('topLogout').classList.toggle('hidden', isAuth);
+      
+      $('btnAbout').classList.toggle('hidden', isAbout);
       $('btnSettings').classList.toggle('hidden', isAuth || isAbout);
-      $('btnAbout').classList.toggle('hidden', !isAuth && !isAbout && name !== 'dashboardPage'); 
       
       $('topAdmin').classList.toggle('hidden', !isAdmin || name === 'adminPage' || isAuth || isAbout);
       $('topCabinet').classList.toggle('hidden', !isAdmin || name !== 'adminPage');
@@ -1267,6 +1339,12 @@
     }
     $('topLogin').addEventListener('click', () => { showPage('authPage'); setMode('login'); });
     $('topRegister').addEventListener('click', () => { showPage('authPage'); setMode('register'); });
+
+    $('btnAbout').addEventListener('click', () => {
+      showPage('aboutPage');
+      $('aboutLogo').src = (document.body.getAttribute('data-theme') === 'light' ? LOGO_DARK : LOGO_LIGHT);
+      $('aboutSignature').src = SIGNATURES[0]; 
+    });
 
     function scheduleReload() {
       clearTimeout(realtimeTimer);
@@ -1504,6 +1582,9 @@
               <p>Официальная страничка сайта Альянса</p>
               <img src="${docLogo}" alt="logo" onerror="this.style.display='none'">
             </div>
+            <div class="print-stamp">
+              <img src="${STAMP_URL}" alt="Stamp">
+            </div>
           </div>
         `;
         
@@ -1698,24 +1779,28 @@
     window.requestCard = async () => {
       if (!currentUser) return;
       showLoading('Генерация...');
-      
-      const name = (userProfile.company_name || 'XX').trim();
-      const words = name.split(/\s+/);
-      let prefix = '';
-      if (words.length >= 3) prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
-      else if (words.length === 2) prefix = (words[0][0] + words[1][0]).toUpperCase();
-      else prefix = name.slice(0, 3).toUpperCase();
+      try {
+        const name = (userProfile.company_name || 'XX').trim();
+        const words = name.split(/\s+/);
+        let prefix = '';
+        if (words.length >= 3) prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase();
+        else if (words.length === 2) prefix = (words[0][0] + words[1][0]).toUpperCase();
+        else prefix = name.slice(0, 3).toUpperCase();
 
-      const p1 = Math.floor(1000 + Math.random() * 9000);
-      const p2 = Math.floor(100 + Math.random() * 900);
-      const p3 = Math.floor(100 + Math.random() * 900);
-      const newCard = `${prefix} БББ ${p1} ${p2} ${p3}`;
+        const p1 = Math.floor(1000 + Math.random() * 9000);
+        const p2 = Math.floor(100 + Math.random() * 900);
+        const p3 = Math.floor(100 + Math.random() * 900);
+        const newCard = `${prefix} БББ ${p1} ${p2} ${p3}`;
 
-      const { error } = await db.from('profiles').update({ card_status: 'pending', card_number: newCard }).eq('id', currentUser.id);
-      hideLoading();
-      if (error) return message(error.message, true);
-      message('Заявка на карту отправлена!');
-      await loadDashboard(true);
+        const { error } = await db.from('profiles').update({ card_status: 'pending', card_number: newCard }).eq('id', currentUser.id);
+        if (error) throw error;
+        message('Заявка на карту отправлена!');
+        await loadDashboard(true);
+      } catch (err) {
+        message('Ошибка: ' + err.message, true);
+      } finally {
+        hideLoading();
+      }
     };
 
     $('btnChangePassword').addEventListener('click', async () => {
@@ -1890,7 +1975,6 @@
 
         let { data: profile } = await db.from('profiles').select('*').eq('id', user.id).maybeSingle();
         
-        // --- ГЕНЕРАЦИЯ ПОДПИСИ (если нет) ---
         if (profile && !profile.signature_url) {
             const randomSig = SIGNATURES[Math.floor(Math.random() * SIGNATURES.length)];
             await db.from('profiles').update({ signature_url: randomSig }).eq('id', user.id);
@@ -2059,7 +2143,6 @@
         await loadExitRequest();
     }
 
-    // Функция для отображения документа о выходе (для пользователя)
     window.showExitDocument = async () => {
         if (!currentUser || !userProfile) return;
         const { data: reqs } = await db.from('exit_requests').select('*').eq('user_id', currentUser.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(1);
@@ -2158,13 +2241,11 @@
       const { data: allPosts } = await db.from('posts').select('*').order('created_at', { ascending: false }).limit(30);
       $('adminPostsList').innerHTML = allPosts?.length ? allPosts.map(p => `<div class="post-card"><button class="post-delete-btn" onclick="deletePost('${esc(p.id)}')" title="Удалить">×</button><div class="post-header"><strong>${esc(p.author_name)}</strong><span>${new Date(p.created_at).toLocaleString()}</span></div><div class="post-content">${esc(p.content)}</div></div>`).join('') : 'Нет постов.';
 
-      // Заявки на вступление
       const { data: apps } = await db.from('applications').select('*').order('created_at', { ascending: false });
       const pendingApps = apps?.filter(a => a.status === 'pending').length || 0;
       updateSectionBadge('adminAppsSection', pendingApps);
       $('adminAppsList').innerHTML = apps?.map(a => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(a.company_name)}</h4><p class="muted">${esc(a.contact_email)}</p></div>${a.status === 'pending' ? `<div class="admin-actions"><button class="primary" onclick="approveApp('${esc(a.id)}','${esc(a.user_id)}')">Принять</button><button class="secondary" onclick="rejectApp('${esc(a.id)}')">Отказать</button></div>` : esc(a.status)}</div>`).join('') || 'Нет заявок.';
 
-      // Заявки на выход
       const { data: exits } = await db.from('exit_requests').select('*').eq('status', 'pending');
       updateSectionBadge('adminExitSection', exits?.length || 0);
       $('adminExitList').innerHTML = exits?.length ? exits.map(e => `<div class="admin-card"><div class="admin-card-info"><h4>${esc(e.company_name)}</h4><p class="muted">Причина: ${esc(e.reason)}</p></div><div class="admin-actions"><button class="primary" style="background:var(--red);" onclick="approveExit('${esc(e.id)}', '${esc(e.user_id)}')">Одобрить выход</button></div></div>`).join('') : 'Нет заявок.';
@@ -2222,32 +2303,26 @@
       $('adminBalanceTarget').innerHTML = options || '<option value="">—</option>';
     }
 
-    // ОДОБРЕНИЕ ВЫХОДА
     window.approveExit = async (requestId, userId) => {
         if (isProcessing) return;
         if (!confirm('Одобрить выход этой авиакомпании? Все её дочерние компании, реестр и праздники будут аннулированы.')) return;
         showLoading('Оформление выхода...');
         try {
-            // 1. Меняем статус заявки
             await db.from('exit_requests').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', requestId);
             
-            // 2. Очищаем профиль
             await db.from('profiles').update({ 
                 joined_at: null, 
                 rank: 'Участник', 
                 registry_status: null, 
                 birthday_date: null, 
-                signature_url: null // Сбрасываем подпись, чтобы при возвращении выпала новая
+                signature_url: null,
+                signature_map: {}
             }).eq('id', userId);
 
-            // 3. Удаляем заявки в Майск и реестр
             await db.from('maysk_requests').delete().eq('user_id', userId);
             await db.from('registry_applications').delete().eq('user_id', userId);
-
-            // 4. Удаляем праздники (скрытые дни рождения)
             await db.from('hidden_holidays').delete().eq('holiday_key', 'birthday_' + userId);
 
-            // 5. Удаляем дочерние компании
             const { data: subs } = await db.from('subsidiaries').select('id').or(`parent_id.eq.${userId},user_id.eq.${userId}`);
             if (subs && subs.length > 0) {
                 const subIds = subs.map(s => s.id);
@@ -2558,6 +2633,9 @@
       const code = displayCompanyCode(userProfile, currentUser?.id);
       const docLogo = getDocLogo();
       
+      const sigUrl = await getSignatureForDoc(type);
+      const sigImg = `<img src="${sigUrl}" style="max-width:150px; display:block; margin-left:auto;">`;
+
       const siteUrl = window.location.origin;
       const qrBlock = `<div class="doc-qr"><div id="docQrContainer"></div><span>Сайт Альянса</span></div>`;
 
@@ -2568,7 +2646,6 @@
         if (!data?.length) return message('Разрешение появится после одобрения', true);
       }
       
-      const sigImg = userProfile?.signature_url ? `<img src="${userProfile.signature_url}" style="max-width:150px; display:block; margin-left:auto;">` : '_________________';
       const stampImg = `<div class="stamp"><img src="${STAMP_URL}"></div>`;
 
       if (type === 'alliance') {
